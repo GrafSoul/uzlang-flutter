@@ -15,19 +15,19 @@ class ContentDao extends DatabaseAccessor<AppDatabase> with _$ContentDaoMixin {
   ContentDao(super.db);
 
   /// Все темы в порядке отображения.
-  Future<List<Topic>> getAllTopics() {
+  Future<List<TopicRow>> getAllTopics() {
     return (select(topics)
           ..orderBy([(t) => OrderingTerm(expression: t.sortOrder)]))
         .get();
   }
 
   /// Тема по стабильному ключу, либо `null`.
-  Future<Topic?> getTopicByKey(String key) {
+  Future<TopicRow?> getTopicByKey(String key) {
     return (select(topics)..where((t) => t.key.equals(key))).getSingleOrNull();
   }
 
   /// Слова темы по порядку.
-  Future<List<Word>> getWordsByTopic(int topicId) {
+  Future<List<WordRow>> getWordsByTopic(int topicId) {
     return (select(words)
           ..where((w) => w.topicId.equals(topicId))
           ..orderBy([(w) => OrderingTerm(expression: w.sortOrder)]))
@@ -35,7 +35,7 @@ class ContentDao extends DatabaseAccessor<AppDatabase> with _$ContentDaoMixin {
   }
 
   /// Фразы темы по порядку.
-  Future<List<Phrase>> getPhrasesByTopic(int topicId) {
+  Future<List<PhraseRow>> getPhrasesByTopic(int topicId) {
     return (select(phrases)
           ..where((p) => p.topicId.equals(topicId))
           ..orderBy([(p) => OrderingTerm(expression: p.sortOrder)]))

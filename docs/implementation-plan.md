@@ -9,7 +9,7 @@
 - [x] Фаза 0 — Окружение и скаффолд ✅
 - [x] Фаза 1 — Дизайн-система в коде (тема + виджеты + ассеты Inter/SVG) ✅
 - [x] Фаза 2 — Данные: Drift-схема + сидинг ✅
-- [ ] Фаза 3 — Домен + ядро-сервисы + DI + роутинг
+- [x] Фаза 3 — Домен + ядро-сервисы + DI + роутинг ✅
 - [ ] Фаза 4 — Онбординг
 - [ ] Фаза 5 — Главная + Выбор темы + Тема-обзор
 - [ ] Фаза 6 — Слова: Учить / Повтор / Тест + Результат
@@ -72,14 +72,15 @@
 
 **Цель:** бизнес-логика и каркас приложения.
 
-- [ ] `domain/entities/` (Freezed): Topic, Word, Phrase, WordBlock, CardProgress, UserProfile, enum ScriptMode
-- [ ] `domain/repositories/` — интерфейсы ContentRepository, ProgressRepository
-- [ ] `data/repositories/` — Drift-реализации
-- [ ] `domain/services/spaced_repetition.dart` — интерфейс `SrScheduler` + **FSRS**
-- [ ] `domain/services/learning_service.dart` — блоки 20 (Учить→Повтор→Тест 10/10), разблок фраз, выбор due
-- [ ] `core/services/` — UserService(анон localUserId), AccessService(isPremium→true), SettingsService, AudioService(заглушка)
-- [ ] `app/` — initial_binding, app_routes, app_pages, app.dart (GetMaterialApp)
-- [ ] **DoD:** приложение поднимается, роуты заведены; юнит-тесты FSRS и learning_service
+- [x] `domain/entities/` (Freezed): Topic, Word, Phrase, CardProgress, UserProfile + WordBlock (plain) + enums (CardKind/SrState/Rating/ScriptMode/BlockStatus)
+- [x] `domain/repositories/` — интерфейсы ContentRepository, ProgressRepository
+- [x] `data/repositories/` — Drift-реализации (DriftContentRepository/DriftProgressRepository) + мапперы Row→domain (Drift-строки переименованы в `*Row` через `@DataClassName`)
+- [x] `domain/services/sr_scheduler.dart` — интерфейс `SrScheduler` + `fsrs_scheduler.dart` (**FSRS** 2.0.1, маппинг state/rating)
+- [x] `domain/services/learning_service.dart` — блоки по 20 (статусы locked/available/completed), разблок фраз
+- [x] `core/services/` — UserService(анон localUserId), AccessService(isPremium→true), SettingsService(GetStorage), AudioService(NoopAudioService заглушка)
+- [x] `app/` — initial_binding (DI permanent), app_routes, app_pages, app.dart (GetMaterialApp) + main bootstrap (GetStorage.init → БД → ensureSeeded → DI)
+- [x] `features/home/` — HomeController/Binding/Page (реальные темы из БД)
+- [x] **DoD:** ✅ приложение поднимается на эмуляторе, сеет БД, показывает 17 тем; роуты заведены; FSRS (4) + learning_service (6) тесты зелёные; весь сьют 17/17
 
 ---
 

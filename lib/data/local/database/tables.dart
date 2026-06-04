@@ -3,6 +3,7 @@ import 'package:drift/drift.dart';
 import '../../../domain/entities/enums.dart';
 
 /// Темы (магазин, базар, город…). Ключ [key] стабилен между релизами контента.
+@DataClassName('TopicRow')
 class Topics extends Table {
   /// Внутренний автоинкрементный идентификатор.
   IntColumn get id => integer().autoIncrement()();
@@ -24,6 +25,7 @@ class Topics extends Table {
 }
 
 /// Слова темы: узбекская латиница + кириллица-чтение + перевод.
+@DataClassName('WordRow')
 class Words extends Table {
   /// Идентификатор.
   IntColumn get id => integer().autoIncrement()();
@@ -49,6 +51,7 @@ class Words extends Table {
 }
 
 /// Фразы темы: закрепление из выученных слов, с примером и иллюстрацией.
+@DataClassName('PhraseRow')
 class Phrases extends Table {
   /// Идентификатор.
   IntColumn get id => integer().autoIncrement()();
@@ -84,6 +87,7 @@ class Phrases extends Table {
 /// Полиморфна: ссылка на карточку = ([cardKind], [cardId]). Поля FSRS
 /// ([stability], [difficulty], [due]…) обновляются планировщиком. [userId] —
 /// шов под мультипользовательность (в V1 всегда `local`).
+@DataClassName('CardProgressRow')
 class CardProgress extends Table {
   /// Идентификатор записи прогресса.
   IntColumn get id => integer().autoIncrement()();
@@ -97,11 +101,14 @@ class CardProgress extends Table {
   /// Идентификатор карточки в её таблице ([Words] или [Phrases]).
   IntColumn get cardId => integer()();
 
-  /// FSRS: стабильность памяти (дни).
-  RealColumn get stability => real().withDefault(const Constant(0))();
+  /// FSRS: стабильность памяти (дни). `null` у новой карточки.
+  RealColumn get stability => real().nullable()();
 
-  /// FSRS: сложность карточки.
-  RealColumn get difficulty => real().withDefault(const Constant(0))();
+  /// FSRS: сложность карточки. `null` у новой карточки.
+  RealColumn get difficulty => real().nullable()();
+
+  /// FSRS: текущий шаг обучения/переобучения. `null` в состоянии review.
+  IntColumn get step => integer().nullable()();
 
   /// Момент следующего повтора (epoch ms).
   IntColumn get due => integer().withDefault(const Constant(0))();
@@ -119,12 +126,6 @@ class CardProgress extends Table {
   /// Число провалов.
   IntColumn get lapses => integer().withDefault(const Constant(0))();
 
-  /// Запланированный интервал (дни).
-  IntColumn get scheduledDays => integer().withDefault(const Constant(0))();
-
-  /// Прошедший интервал (дни).
-  IntColumn get elapsedDays => integer().withDefault(const Constant(0))();
-
   @override
   List<Set<Column<Object>>> get uniqueKeys => [
         {userId, cardKind, cardId},
@@ -132,6 +133,7 @@ class CardProgress extends Table {
 }
 
 /// Агрегированная статистика пользователя (геймификация).
+@DataClassName('UserStatRow')
 class UserStats extends Table {
   /// Владелец статистики.
   TextColumn get userId => text()();
@@ -156,6 +158,7 @@ class UserStats extends Table {
 }
 
 /// Прогресс по блокам (20 карточек): завершение, точность, разблокировка.
+@DataClassName('BlockProgressRow')
 class BlockProgress extends Table {
   /// Идентификатор.
   IntColumn get id => integer().autoIncrement()();

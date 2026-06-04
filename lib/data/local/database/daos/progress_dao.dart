@@ -17,7 +17,7 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
   ProgressDao(super.db);
 
   /// Прогресс конкретной карточки, либо `null`, если ещё не изучалась.
-  Future<CardProgressData?> getProgress(
+  Future<CardProgressRow?> getProgress(
     String userId,
     CardKind kind,
     int cardId,
@@ -31,7 +31,7 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Карточки, у которых подошёл срок повтора ([CardProgress.due] ≤ [nowMs]).
-  Future<List<CardProgressData>> getDueCards(
+  Future<List<CardProgressRow>> getDueCards(
     String userId,
     CardKind kind,
     int nowMs,
@@ -51,7 +51,7 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Статистика пользователя, либо `null`.
-  Future<UserStat?> getStats(String userId) {
+  Future<UserStatRow?> getStats(String userId) {
     return (select(userStats)..where((s) => s.userId.equals(userId)))
         .getSingleOrNull();
   }
@@ -62,7 +62,7 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
   }
 
   /// Завершённые блоки темы в заданной области (слова/фразы).
-  Future<List<BlockProgressData>> getBlocks(
+  Future<List<BlockProgressRow>> getBlocks(
     String userId,
     int topicId,
     CardKind scope,

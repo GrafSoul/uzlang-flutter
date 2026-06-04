@@ -1,17 +1,31 @@
-// Базовый smoke-тест витрины дизайн-системы (Фаза 1).
+// Smoke-тест виджета дизайн-системы (без полного bootstrap приложения).
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:uzlang_mobile/main.dart';
+import 'package:uzlang_mobile/core/theme/theme.dart';
+import 'package:uzlang_mobile/features/shared/widgets/widgets.dart';
 
 void main() {
-  testWidgets('Витрина DS строится и показывает карточку слова',
+  testWidgets('PrimaryButton строится и реагирует на нажатие',
       (WidgetTester tester) async {
-    await tester.pumpWidget(const UzLangApp());
+    var tapped = false;
+    await tester.pumpWidget(
+      MaterialApp(
+        theme: AppTheme.dark,
+        home: Scaffold(
+          body: PrimaryButton(
+            label: 'Продолжить',
+            onPressed: () => tapped = true,
+          ),
+        ),
+      ),
+    );
 
-    // Заголовок витрины и карточка слова (латиница + перевод) видны сверху.
-    expect(find.text('UzLang · Design System'), findsOneWidget);
-    expect(find.text('Salom'), findsOneWidget);
-    expect(find.text('Здравствуйте'), findsOneWidget);
+    expect(find.text('Продолжить'), findsOneWidget);
+
+    await tester.tap(find.text('Продолжить'));
+    await tester.pump();
+
+    expect(tapped, isTrue);
   });
 }
