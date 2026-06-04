@@ -6,7 +6,7 @@
 
 ## Прогресс по фазам
 
-- [ ] Фаза 0 — Окружение и скаффолд
+- [x] Фаза 0 — Окружение и скаффолд ✅
 - [ ] Фаза 1 — Дизайн-система в коде (тема)
 - [ ] Фаза 2 — Данные: Drift-схема + сидинг
 - [ ] Фаза 3 — Домен + ядро-сервисы + DI + роутинг
@@ -26,13 +26,16 @@
 
 **Цель:** пустой, но запускаемый проект с правильной структурой и зависимостями.
 
-- [ ] Починить Flutter SDK в PATH (блокер — был `flutter not found`)
-- [ ] `flutter create --org com.uzlang --project-name uzlang_mobile .`
-- [ ] `pubspec.yaml`: get, drift, drift_flutter, sqlite3_flutter_libs, get_storage, freezed_annotation, json_annotation, flutter_svg, just_audio, fsrs, path_provider, intl
-- [ ] dev_deps: build_runner, drift_dev, freezed, json_serializable, flutter_lints
-- [ ] Дерево папок `lib/` (app/core/domain/data/features/l10n) — заготовки
-- [ ] `analysis_options.yaml` (strict lints) + `.gitignore` (codegen, .dart_tool)
-- [ ] **DoD:** `flutter run` пустой экран; `flutter analyze` + `build_runner build` зелёные
+- [x] Flutter SDK найден: `~/Development/flutter/bin` (Flutter 3.32.2 / Dart 3.8.1)
+- [x] `flutter create --org com.uzlang --project-name uzlang_mobile .` (коммит `204bee6`)
+- [x] `pubspec.yaml`: get, drift, drift_flutter, get_storage, freezed_annotation, json_annotation, flutter_svg, just_audio, fsrs, path_provider, intl
+- [x] dev_deps: build_runner, drift_dev, freezed, json_serializable, flutter_lints
+- [x] `flutter pub get` (есть `pubspec.lock`)
+- [x] Дерево папок `lib/` (app/core/domain/data/features/l10n) + `assets/{icons,fonts,audio}` — заготовки (`.gitkeep`)
+- [x] `analysis_options.yaml` (strict lints) + `.gitignore` (codegen, .dart_tool)
+- [x] **DoD:** `flutter analyze` → No issues found; `build_runner build` → зелёный (freezed/json/drift тулчейн ок); `pub get` ок
+- ℹ️ `sqlite3_flutter_libs` подтянут транзитивно через `drift_flutter` (есть в lock); если позже понадобится явная версия — добавить прямой зависимостью к Фазе 2
+- ℹ️ `lib/main.dart` пока дефолтный counter — заменяется в Фазе 1; on-device `flutter run` владелец глянет глазами при первом запуске
 
 ---
 
