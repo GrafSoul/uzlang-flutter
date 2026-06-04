@@ -7,7 +7,7 @@
 ## Прогресс по фазам
 
 - [x] Фаза 0 — Окружение и скаффолд ✅
-- [ ] Фаза 1 — Дизайн-система в коде (тема)
+- [x] Фаза 1 — Дизайн-система в коде (тема + виджеты + ассеты Inter/SVG) ✅
 - [ ] Фаза 2 — Данные: Drift-схема + сидинг
 - [ ] Фаза 3 — Домен + ядро-сервисы + DI + роутинг
 - [ ] Фаза 4 — Онбординг
@@ -43,14 +43,15 @@
 
 **Цель:** токены и базовые виджеты из Figma-DS в коде.
 
-- [ ] `core/theme/app_colors.dart` (зеркало `UzLang / Colors`; success `#5BC46B`, accent `#FF8A3D`)
-- [ ] `core/theme/app_text_styles.dart` (Inter: Word/Title/Heading/Body/Reading/Label/Caption)
-- [ ] `core/theme/app_dimens.dart` (радиусы 16/18/20/28, отступы, иконки 24/26)
-- [ ] `core/theme/app_theme_ext.dart` (`ThemeExtension`: surfaceRaised, accentTint, successTint)
-- [ ] `core/theme/app_theme.dart` (`ThemeData` dark по умолч. + light заглушка)
-- [ ] `features/shared/widgets/` (AppScaffold, PrimaryButton, SecondaryButton, AppCard, AppIcon(SVG), SegmentedProgress, AppToggle, BottomNavBar, RingBadge, Chip)
-- [ ] `assets/icons/*.svg` (экспорт line-иконок) + `assets/fonts/Inter`
-- [ ] **DoD:** демо-страница виджетов совпадает с Figma (тёмная)
+- [x] `core/theme/app_colors.dart` (зеркало `UzLang / Colors`; success `#5BC46B`, accent `#FF8A3D`)
+- [x] `core/theme/app_text_styles.dart` (Inter: Display/Word/Title/Heading/Body/Reading/Label/Caption)
+- [x] `core/theme/app_dimens.dart` (радиусы 12/16/20/28, отступы 4-pt, иконки 20/24/26)
+- [x] `core/theme/app_theme_ext.dart` (`ThemeExtension`: surfaceRaised/line/тинты/статусы + copyWith/lerp)
+- [x] `core/theme/app_theme.dart` (`ThemeData` dark по умолч. + light-заглушка + `context.colors`)
+- [x] баррелы `core/theme/theme.dart`, `features/shared/widgets/widgets.dart`
+- [~] `features/shared/widgets/` — готово: **PrimaryButton, SecondaryButton, AppCard, AppChip, AppIcon(SVG)**. Остальные (AppScaffold, SegmentedProgress, AppToggle, BottomNavBar, RingBadge) — по мере надобности экранов (Фаза 5+)
+- [x] `assets/icons/*.svg` — **21 иконка экспортирована из Figma-DS** (`ic-*` → SVG, перекраска через ColorFilter) + `assets/fonts/Inter.ttf` (вариативный, OFL) объявлены в pubspec
+- [x] **DoD:** витрина DS (`main.dart` → DesignSystemShowcase) собрана, проходит тест, запущена на эмуляторе Android — совпадает с Figma (тёмная) ✅
 
 ---
 
