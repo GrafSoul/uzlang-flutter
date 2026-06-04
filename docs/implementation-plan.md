@@ -8,7 +8,7 @@
 
 - [x] Фаза 0 — Окружение и скаффолд ✅
 - [x] Фаза 1 — Дизайн-система в коде (тема + виджеты + ассеты Inter/SVG) ✅
-- [ ] Фаза 2 — Данные: Drift-схема + сидинг
+- [x] Фаза 2 — Данные: Drift-схема + сидинг ✅
 - [ ] Фаза 3 — Домен + ядро-сервисы + DI + роутинг
 - [ ] Фаза 4 — Онбординг
 - [ ] Фаза 5 — Главная + Выбор темы + Тема-обзор
@@ -59,11 +59,12 @@
 
 **Цель:** локальная БД со схемой и залитым контентом.
 
-- [ ] Таблицы: `Topics`, `Words`, `Phrases`, `WordBlocks`, `Progress` (ease/interval/due/state для FSRS), `Stats`
-- [ ] `app_database.dart` + DAO (`ContentDao`, `ProgressDao`)
-- [ ] `data/local/seed/seed_data.dart` — перенос из старого `seedData.js` (17 тем, ~130 слов, ~255 фраз; uz/latin/reading/ru/level/topicKey)
-- [ ] Сидинг при первом запуске (флаг GetStorage) + версия контента
-- [ ] **DoD:** БД создаётся, сидинг 1 раз; DAO возвращает данные; тесты DAO
+- [x] Таблицы (`tables.dart`): `Topics`, `Words`, `Phrases`, `CardProgress` (FSRS: stability/difficulty/due/state/reps/lapses…, полиморфно по cardKind), `UserStats`, `BlockProgress`. FK + `PRAGMA foreign_keys=ON`
+- [x] `app_database.dart` (schemaVersion 1, миграции) + DAO (`ContentDao`, `ProgressDao`) + codegen
+- [x] **Контент перенесён из `seedData.js` ЦЕЛИКОМ** → `assets/seed/content.json` (Node-экстракция): **17 тем, 2922 слова, 255 фраз** (решение владельца — всё из React-версии)
+- [x] Сидинг: `ContentSeeder` + `SeedVersionStore` (интерфейс) + `GetStorageSeedVersionStore` (impl). Идемпотентно, атомарно (транзакция), пере-сидинг по версии
+- [x] **DoD:** ✅ in-memory тесты — сеет 17/2922/255, идемпотентность, пере-сидинг, связи FK; 6 тестов зелёные
+- ℹ️ codegen (`*.g.dart`) не в VCS (gitignore) — регенерится `build_runner`. На UI/старт ещё не подключено — это Фаза 3 (InitialBinding)
 
 ---
 
