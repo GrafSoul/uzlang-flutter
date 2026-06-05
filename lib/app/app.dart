@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import '../core/services/settings_service.dart';
 import '../core/theme/theme.dart';
 import 'routes/app_pages.dart';
+import 'routes/app_routes.dart';
 
 /// Корневой виджет приложения (GetMaterialApp).
 ///
@@ -16,13 +17,15 @@ class UzLangApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final settings = Get.find<SettingsService>();
+    final initialRoute =
+        settings.onboardingCompleted ? Routes.home : Routes.onboarding;
     return GetMaterialApp(
       title: 'UzLang',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.light,
       darkTheme: AppTheme.dark,
       themeMode: settings.themeMode,
-      initialRoute: AppPages.initial,
+      initialRoute: initialRoute,
       getPages: AppPages.routes,
     );
   }

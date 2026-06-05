@@ -4,6 +4,9 @@
 abstract final class Routes {
   Routes._();
 
+  /// Онбординг (первый запуск).
+  static const String onboarding = '/onboarding';
+
   /// Главный экран (список тем).
   static const String home = '/home';
 }
