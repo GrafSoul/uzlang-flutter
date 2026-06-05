@@ -1,5 +1,6 @@
 import '../../domain/entities/card_progress.dart';
 import '../../domain/entities/enums.dart';
+import '../../domain/entities/user_stats.dart';
 import '../../domain/repositories/progress_repository.dart';
 import '../local/database/daos/progress_dao.dart';
 import '../local/database/mappers.dart';
@@ -37,5 +38,35 @@ class DriftProgressRepository implements ProgressRepository {
       now.toUtc().millisecondsSinceEpoch,
     );
     return rows.map((r) => r.toDomain()).toList();
+  }
+
+  @override
+  Future<UserStats> getStats(String userId) async {
+    final row = await _dao.getStats(userId);
+    if (row == null) return UserStats.empty;
+    return UserStats(
+      xp: row.xp,
+      streakCurrent: row.streakCurrent,
+      streakBest: row.streakBest,
+      lastActiveDay: row.lastActiveDay,
+    );
+  }
+
+  @override
+  Future<int> getLearnedWordCount(String userId, int topicId) {
+    return _dao.countLearnedWords(userId, topicId);
+  }
+
+  @override
+  Future<Set<int>> getCompletedBlockIndices(
+    String userId,
+    int topicId,
+    CardKind scope,
+  ) async {
+    final rows = await _dao.getBlocks(userId, topicId, scope);
+    return rows
+        .where((b) => b.completedAt != null)
+        .map((b) => b.blockIndex)
+        .toSet();
   }
 }

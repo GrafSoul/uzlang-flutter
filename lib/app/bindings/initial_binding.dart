@@ -13,6 +13,7 @@ import '../../domain/repositories/progress_repository.dart';
 import '../../domain/services/fsrs_scheduler.dart';
 import '../../domain/services/learning_service.dart';
 import '../../domain/services/sr_scheduler.dart';
+import '../../domain/services/topic_progress_service.dart';
 
 /// Композиционный корень приложения: регистрирует глобальные сервисы.
 ///
@@ -42,5 +43,12 @@ class InitialBinding extends Bindings {
 
     Get.put<SrScheduler>(FsrsScheduler(), permanent: true);
     Get.put<LearningService>(const LearningService(), permanent: true);
+    Get.put<TopicProgressService>(
+      TopicProgressService(
+        Get.find<ContentRepository>(),
+        Get.find<ProgressRepository>(),
+      ),
+      permanent: true,
+    );
   }
 }

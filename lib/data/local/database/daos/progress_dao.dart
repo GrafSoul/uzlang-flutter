@@ -10,11 +10,26 @@ part 'progress_dao.g.dart';
 ///
 /// Тонкий слой: апсерты и выборки. Расчёт интервалов (FSRS) и геймификация —
 /// в domain-сервисах, которые вызывают эти методы.
-@DriftAccessor(tables: [CardProgress, UserStats, BlockProgress])
+@DriftAccessor(tables: [CardProgress, UserStats, BlockProgress, Words])
 class ProgressDao extends DatabaseAccessor<AppDatabase>
     with _$ProgressDaoMixin {
   /// Создаёт DAO, привязанный к базе [db].
   ProgressDao(super.db);
+
+  /// Сколько слов темы выучено (карточки в состоянии review) у пользователя.
+  Future<int> countLearnedWords(String userId, int topicId) async {
+    final count = cardProgress.id.count();
+    final query = selectOnly(cardProgress).join([
+      innerJoin(words, words.id.equalsExp(cardProgress.cardId)),
+    ])
+      ..addColumns([count])
+      ..where(cardProgress.userId.equals(userId) &
+          cardProgress.cardKind.equalsValue(CardKind.word) &
+          cardProgress.state.equalsValue(SrState.review) &
+          words.topicId.equals(topicId));
+    final row = await query.getSingle();
+    return row.read(count) ?? 0;
+  }
 
   /// Прогресс конкретной карточки, либо `null`, если ещё не изучалась.
   Future<CardProgressRow?> getProgress(

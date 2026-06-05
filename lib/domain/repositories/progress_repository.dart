@@ -1,5 +1,6 @@
 import '../entities/card_progress.dart';
 import '../entities/enums.dart';
+import '../entities/user_stats.dart';
 
 /// Доступ к прогрессу интервального повторения (абстракция).
 ///
@@ -17,5 +18,18 @@ abstract interface class ProgressRepository {
     String userId,
     CardKind kind,
     DateTime now,
+  );
+
+  /// Статистика пользователя (пустая, если ещё нет записи).
+  Future<UserStats> getStats(String userId);
+
+  /// Сколько слов темы выучено пользователем.
+  Future<int> getLearnedWordCount(String userId, int topicId);
+
+  /// Индексы завершённых блоков темы в заданной области (слова/фразы).
+  Future<Set<int>> getCompletedBlockIndices(
+    String userId,
+    int topicId,
+    CardKind scope,
   );
 }

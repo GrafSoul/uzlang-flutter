@@ -1,20 +1,40 @@
 import 'package:get/get.dart';
 
-import '../../domain/entities/topic.dart';
-import '../../domain/repositories/content_repository.dart';
+import '../../core/services/settings_service.dart';
+import '../../core/services/user_service.dart';
+import '../../domain/entities/topic_progress.dart';
+import '../../domain/entities/user_stats.dart';
+import '../../domain/repositories/progress_repository.dart';
+import '../../domain/services/topic_progress_service.dart';
 
 /// Контроллер главного экрана.
 ///
-/// Тонкий: держит реактивное состояние и дёргает [ContentRepository].
-/// Бизнес-логики и обращения к БД напрямую — нет.
+/// Тонкий: собирает данные для Главной (имя, статистика, темы с прогрессом)
+/// через сервисы/репозитории. Логика разблокировки тем — в [TopicProgressService].
 class HomeController extends GetxController {
-  /// Создаёт контроллер поверх репозитория контента.
-  HomeController(this._content);
+  /// Создаёт контроллер.
+  HomeController(
+      this._user, this._progress, this._settings, this._topicProgress);
 
-  final ContentRepository _content;
+  final UserService _user;
+  final ProgressRepository _progress;
+  final SettingsService _settings;
+  final TopicProgressService _topicProgress;
 
-  /// Список тем.
-  final RxList<Topic> topics = <Topic>[].obs;
+  /// Имя пользователя.
+  final RxString userName = ''.obs;
+
+  /// Статистика (XP, streak).
+  final Rx<UserStats> stats = UserStats.empty.obs;
+
+  /// Дневная цель (минуты).
+  final RxInt dailyGoalMinutes = 10.obs;
+
+  /// Минут пройдено сегодня (в V1 пока 0, наполнится в Фазе 8).
+  final RxInt todayMinutes = 0.obs;
+
+  /// Темы с прогрессом.
+  final RxList<TopicProgress> topics = <TopicProgress>[].obs;
 
   /// Идёт ли загрузка.
   final RxBool isLoading = true.obs;
@@ -22,13 +42,29 @@ class HomeController extends GetxController {
   @override
   void onInit() {
     super.onInit();
-    loadTopics();
+    load();
   }
 
-  /// Загружает темы из репозитория.
-  Future<void> loadTopics() async {
+  /// Тема для карточки «Продолжить» — первая начатая или доступная.
+  TopicProgress? get continueTopic {
+    for (final t in topics) {
+      if (t.status == TopicStatus.inProgress) return t;
+    }
+    for (final t in topics) {
+      if (t.status == TopicStatus.available) return t;
+    }
+    return null;
+  }
+
+  /// Загружает данные Главной.
+  Future<void> load() async {
     isLoading.value = true;
-    topics.value = await _content.getTopics();
+    final userId = _user.localUserId;
+
+    userName.value = _user.name;
+    dailyGoalMinutes.value = _settings.dailyGoalMinutes;
+    stats.value = await _progress.getStats(userId);
+    topics.value = await _topicProgress.buildAll(userId);
     isLoading.value = false;
   }
 }

@@ -7,6 +7,12 @@ abstract final class Routes {
   /// Онбординг (первый запуск).
   static const String onboarding = '/onboarding';
 
-  /// Главный экран (список тем).
+  /// Главный экран.
   static const String home = '/home';
+
+  /// Выбор темы (список тем по секциям).
+  static const String topics = '/topics';
+
+  /// Тема — обзор (блоки слов/фраз).
+  static const String topicDetail = '/topic';
 }

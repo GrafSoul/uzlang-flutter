@@ -42,6 +42,15 @@ class ContentDao extends DatabaseAccessor<AppDatabase> with _$ContentDaoMixin {
         .get();
   }
 
+  /// Количество слов в теме.
+  Future<int> countWordsByTopic(int topicId) {
+    return (selectOnly(words)
+          ..addColumns([words.id.count()])
+          ..where(words.topicId.equals(topicId)))
+        .map((r) => r.read(words.id.count()) ?? 0)
+        .getSingle();
+  }
+
   /// Количество тем (для проверки сидинга).
   Future<int> countTopics() => topics.count().getSingle();
 
