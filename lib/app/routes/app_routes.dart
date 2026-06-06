@@ -30,4 +30,10 @@ abstract final class Routes {
 
   /// Слова — Повтор (FSRS due).
   static const String review = '/review';
+
+  /// Фразы — Учить.
+  static const String phraseLearn = '/phrase-learn';
+
+  /// Фразы — Тест (собери фразу).
+  static const String phraseTest = '/phrase-test';
 }

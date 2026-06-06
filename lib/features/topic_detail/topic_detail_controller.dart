@@ -32,11 +32,20 @@ class TopicDetailController extends GetxController {
   /// Блоки слов.
   final RxList<WordBlock> blocks = <WordBlock>[].obs;
 
+  /// Блоки фраз (диапазоны + статусы).
+  final RxList<BlockInfo> phraseBlocks = <BlockInfo>[].obs;
+
+  /// Активная вкладка: 0 — Слова, 1 — Фразы.
+  final RxInt activeTab = 0.obs;
+
   /// Выучено слов в теме.
   final RxInt learnedWords = 0.obs;
 
   /// Всего слов в теме.
   final RxInt totalWords = 0.obs;
+
+  /// Всего фраз в теме.
+  final RxInt totalPhrases = 0.obs;
 
   /// Открыты ли фразы темы.
   final RxBool phrasesUnlocked = false.obs;
@@ -54,13 +63,28 @@ class TopicDetailController extends GetxController {
   /// Процент выученного (0..100).
   int get percentInt => (percent * 100).round();
 
-  /// Активный блок (первый доступный, не пройденный), либо `null`.
+  /// Активный блок слов (первый доступный), либо `null`.
   WordBlock? get activeBlock {
     for (final b in blocks) {
       if (b.status == BlockStatus.available) return b;
     }
     return null;
   }
+
+  /// Активный блок фраз (первый доступный), либо `null`.
+  BlockInfo? get activePhraseBlock {
+    for (final b in phraseBlocks) {
+      if (b.status == BlockStatus.available) return b;
+    }
+    return null;
+  }
+
+  /// Сколько слов осталось выучить для разблокировки фраз.
+  int get remainingWords =>
+      (totalWords.value - learnedWords.value).clamp(0, totalWords.value);
+
+  /// Переключает вкладку.
+  void setTab(int index) => activeTab.value = index;
 
   /// Сколько слов выучено внутри блока [block].
   int learnedInBlock(WordBlock block) {
@@ -94,6 +118,16 @@ class TopicDetailController extends GetxController {
       learnedWords: learnedWords.value,
       totalWords: words.length,
     );
+
+    final phrases = await _content.getPhrases(topic.id);
+    totalPhrases.value = phrases.length;
+    final phraseCompleted = await _progress.getCompletedBlockIndices(
+      userId,
+      topic.id,
+      CardKind.phrase,
+    );
+    phraseBlocks.value = _learning.buildBlocks(phrases.length, phraseCompleted);
+
     streak.value = (await _progress.getStats(userId)).streakCurrent;
 
     isLoading.value = false;

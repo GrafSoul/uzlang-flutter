@@ -6,6 +6,24 @@ import 'package:uzlang_mobile/domain/services/learning_service.dart';
 void main() {
   const service = LearningService();
 
+  group('LearningService.buildBlocks (универсально для слов/фраз)', () {
+    test('45 элементов → 3 блока 20/20/5', () {
+      final blocks = service.buildBlocks(45, <int>{});
+
+      expect(blocks.length, 3);
+      expect(blocks[0].count, 20);
+      expect(blocks[2].count, 5);
+    });
+
+    test('статусы: пройден → доступен → заперт', () {
+      final blocks = service.buildBlocks(60, <int>{0});
+
+      expect(blocks[0].status, BlockStatus.completed);
+      expect(blocks[1].status, BlockStatus.available);
+      expect(blocks[2].status, BlockStatus.locked);
+    });
+  });
+
   List<Word> makeWords(int count) => List.generate(
         count,
         (i) => Word(

@@ -12,6 +12,7 @@ class ResultArgs {
     required this.streak,
     required this.unlockedNext,
     this.nextArgs,
+    this.isPhrase = false,
   });
 
   /// Тема.
@@ -34,6 +35,9 @@ class ResultArgs {
 
   /// Аргументы следующего блока (если разблокирован).
   final LessonArgs? nextArgs;
+
+  /// Это результат блока фраз (иначе — слов).
+  final bool isPhrase;
 
   /// Точность в процентах.
   int get accuracyPercent => (accuracy * 100).round();

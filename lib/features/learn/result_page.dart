@@ -60,7 +60,7 @@ class ResultPage extends StatelessWidget {
                     PrimaryButton(
                       label: 'Следующий блок',
                       onPressed: () => Get.offNamed<void>(
-                        Routes.learn,
+                        args.isPhrase ? Routes.phraseLearn : Routes.learn,
                         arguments: args.nextArgs,
                       ),
                     ),

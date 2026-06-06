@@ -20,14 +20,29 @@ class LessonService {
     required int topicId,
     required int blockIndex,
     required double accuracy,
-  }) async {
-    await _progress.completeBlock(
-      userId,
-      topicId,
-      CardKind.word,
-      blockIndex,
-      accuracy,
-    );
+  }) {
+    return _completeBlock(userId, topicId, CardKind.word, blockIndex, accuracy);
+  }
+
+  /// Завершает блок фраз: помечает пройденным и начисляет награду.
+  Future<UserStats> completePhraseBlock({
+    required String userId,
+    required int topicId,
+    required int blockIndex,
+    required double accuracy,
+  }) {
+    return _completeBlock(
+        userId, topicId, CardKind.phrase, blockIndex, accuracy);
+  }
+
+  Future<UserStats> _completeBlock(
+    String userId,
+    int topicId,
+    CardKind scope,
+    int blockIndex,
+    double accuracy,
+  ) async {
+    await _progress.completeBlock(userId, topicId, scope, blockIndex, accuracy);
     return _gamification.awardBlockCompletion(userId);
   }
 }

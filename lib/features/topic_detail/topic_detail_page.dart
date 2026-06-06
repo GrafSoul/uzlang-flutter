@@ -8,15 +8,7 @@ import '../learn/lesson_args.dart';
 import '../shared/widgets/widgets.dart';
 import 'topic_detail_controller.dart';
 
-/// Запускает учебную сессию блока [blockIndex] темы.
-void _startBlock(TopicDetailController controller, int blockIndex) {
-  Get.toNamed<void>(
-    Routes.learn,
-    arguments: LessonArgs(topic: controller.topic, blockIndex: blockIndex),
-  );
-}
-
-/// Экран «Тема — обзор» — по макету Figma «03 · Тема — обзор».
+/// Экран «Тема — обзор» — по макету Figma (03 Слова / 08 Фразы-заперты).
 class TopicDetailPage extends GetView<TopicDetailController> {
   /// Создаёт экран обзора темы.
   const TopicDetailPage({super.key});
@@ -45,19 +37,10 @@ class TopicDetailPage extends GetView<TopicDetailController> {
                     const SizedBox(height: AppDimens.spaceMd),
                     const _Tabs(),
                     const SizedBox(height: AppDimens.spaceLg),
-                    Text(
-                      'БЛОКИ ПО 20 СЛОВ · УЧИТЬ → ПОВТОР → ТЕСТ',
-                      style: AppTextStyles.caption.copyWith(
-                        color: AppColors.textMuted,
-                        letterSpacing: 0.5,
-                      ),
-                    ),
-                    const SizedBox(height: AppDimens.spaceMd),
-                    ...controller.blocks.map((b) => Padding(
-                          padding:
-                              const EdgeInsets.only(bottom: AppDimens.spaceMd),
-                          child: _BlockCard(block: b),
-                        )),
+                    if (controller.activeTab.value == 0)
+                      ..._wordsTab()
+                    else
+                      ..._phrasesTab(),
                   ],
                 ),
               ),
@@ -67,6 +50,64 @@ class TopicDetailPage extends GetView<TopicDetailController> {
         }),
       ),
     );
+  }
+
+  List<Widget> _wordsTab() {
+    return [
+      const _SectionLabel('БЛОКИ ПО 20 СЛОВ · УЧИТЬ → ПОВТОР → ТЕСТ'),
+      const SizedBox(height: AppDimens.spaceMd),
+      ...controller.blocks.map((b) => Padding(
+            padding: const EdgeInsets.only(bottom: AppDimens.spaceMd),
+            child: _BlockCard(
+              number: b.index + 1,
+              status: b.status,
+              subtitle: _wordSubtitle(b),
+              onTap: b.status == BlockStatus.available
+                  ? () => _startWordBlock(controller, b.index)
+                  : null,
+            ),
+          )),
+    ];
+  }
+
+  String _wordSubtitle(WordBlock b) {
+    final total = b.words.length;
+    switch (b.status) {
+      case BlockStatus.completed:
+        return '$total слов · пройден';
+      case BlockStatus.available:
+        final learned = controller.learnedInBlock(b);
+        return learned > 0
+            ? '$learned / $total · продолжить'
+            : '$total слов · начать';
+      case BlockStatus.locked:
+        return 'Откроется после блока ${b.index}';
+    }
+  }
+
+  List<Widget> _phrasesTab() {
+    if (!controller.phrasesUnlocked.value) {
+      return const [_PhrasesLocked()];
+    }
+    return [
+      const _SectionLabel('БЛОКИ ФРАЗ · УЧИТЬ → ТЕСТ'),
+      const SizedBox(height: AppDimens.spaceMd),
+      ...controller.phraseBlocks.map((b) => Padding(
+            padding: const EdgeInsets.only(bottom: AppDimens.spaceMd),
+            child: _BlockCard(
+              number: b.index + 1,
+              status: b.status,
+              subtitle: switch (b.status) {
+                BlockStatus.completed => '${b.count} фраз · пройден',
+                BlockStatus.available => '${b.count} фраз · собрать',
+                BlockStatus.locked => 'Откроется после блока ${b.index}',
+              },
+              onTap: b.status == BlockStatus.available
+                  ? () => _startPhraseBlock(controller, b.index)
+                  : null,
+            ),
+          )),
+    ];
   }
 }
 
@@ -189,60 +230,24 @@ class _Tabs extends GetView<TopicDetailController> {
 
   @override
   Widget build(BuildContext context) {
+    final tab = controller.activeTab.value;
     final unlocked = controller.phrasesUnlocked.value;
     return Row(
       children: [
         Expanded(
-          child: Container(
-            padding: const EdgeInsets.symmetric(vertical: AppDimens.spaceMd),
-            decoration: BoxDecoration(
-              color: AppColors.accent,
-              borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-            ),
-            alignment: Alignment.center,
-            child: Text(
-              'Слова · ${controller.learnedWords.value}/${controller.totalWords.value}',
-              style: AppTextStyles.label.copyWith(color: AppColors.onAccent),
-            ),
+          child: _TabButton(
+            label: 'Слова · ${controller.learnedWords.value}/${controller.totalWords.value}',
+            active: tab == 0,
+            onTap: () => controller.setTab(0),
           ),
         ),
         const SizedBox(width: AppDimens.spaceMd),
         Expanded(
-          child: GestureDetector(
-            onTap: unlocked
-                ? () {}
-                : () => Get.snackbar(
-                      'Фразы закрыты',
-                      'Сначала выучите все слова темы',
-                      snackPosition: SnackPosition.BOTTOM,
-                    ),
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: AppDimens.spaceMd),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-                border: Border.all(color: AppColors.line),
-              ),
-              alignment: Alignment.center,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (!unlocked) ...[
-                    const AppIcon(AppIcons.lock,
-                        color: AppColors.textMuted, size: AppDimens.iconSm),
-                    const SizedBox(width: AppDimens.spaceXs),
-                  ],
-                  Text(
-                    'Фразы',
-                    style: AppTextStyles.label.copyWith(
-                      color: unlocked
-                          ? AppColors.textPrimary
-                          : AppColors.textMuted,
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          child: _TabButton(
+            label: 'Фразы',
+            active: tab == 1,
+            locked: !unlocked,
+            onTap: () => controller.setTab(1),
           ),
         ),
       ],
@@ -250,16 +255,87 @@ class _Tabs extends GetView<TopicDetailController> {
   }
 }
 
-class _BlockCard extends GetView<TopicDetailController> {
-  const _BlockCard({required this.block});
+class _TabButton extends StatelessWidget {
+  const _TabButton({
+    required this.label,
+    required this.active,
+    required this.onTap,
+    this.locked = false,
+  });
 
-  final WordBlock block;
+  final String label;
+  final bool active;
+  final bool locked;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
-    final n = block.index + 1;
-    final isActive = block.status == BlockStatus.available;
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: AppDimens.spaceMd),
+        decoration: BoxDecoration(
+          color: active ? AppColors.accent : AppColors.surface,
+          borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+          border: active ? null : Border.all(color: AppColors.line),
+        ),
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            if (locked) ...[
+              AppIcon(AppIcons.lock,
+                  color: active ? AppColors.onAccent : AppColors.textMuted,
+                  size: AppDimens.iconSm),
+              const SizedBox(width: AppDimens.spaceXs),
+            ],
+            Text(
+              label,
+              style: AppTextStyles.label.copyWith(
+                color: active ? AppColors.onAccent : AppColors.textPrimary,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
+class _SectionLabel extends StatelessWidget {
+  const _SectionLabel(this.text);
+
+  final String text;
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      text,
+      style: AppTextStyles.caption.copyWith(
+        color: AppColors.textMuted,
+        letterSpacing: 0.5,
+      ),
+    );
+  }
+}
+
+/// Карточка блока (универсальная для слов и фраз).
+class _BlockCard extends StatelessWidget {
+  const _BlockCard({
+    required this.number,
+    required this.status,
+    required this.subtitle,
+    required this.onTap,
+  });
+
+  final int number;
+  final BlockStatus status;
+  final String subtitle;
+  final VoidCallback? onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final isActive = status == BlockStatus.available;
     final card = Container(
       padding: const EdgeInsets.all(AppDimens.spaceLg),
       decoration: BoxDecoration(
@@ -272,25 +348,26 @@ class _BlockCard extends GetView<TopicDetailController> {
       ),
       child: Row(
         children: [
-          _BlockMarker(block: block, number: n),
+          _BlockMarker(status: status, number: number),
           const SizedBox(width: AppDimens.spaceMd),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Блок $n',
+                  'Блок $number',
                   style: AppTextStyles.label.copyWith(
-                    color: block.status == BlockStatus.locked
+                    color: status == BlockStatus.locked
                         ? AppColors.textMuted
                         : AppColors.textPrimary,
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(_subtitle(),
+                Text(subtitle,
                     style: AppTextStyles.caption.copyWith(
-                      color:
-                          isActive ? AppColors.accent : AppColors.textSecondary,
+                      color: isActive
+                          ? AppColors.accent
+                          : AppColors.textSecondary,
                     )),
               ],
             ),
@@ -314,40 +391,22 @@ class _BlockCard extends GetView<TopicDetailController> {
       ),
     );
 
-    if (isActive) {
-      return GestureDetector(
-        onTap: () => _startBlock(controller, block.index),
-        child: card,
-      );
+    if (onTap != null) {
+      return GestureDetector(onTap: onTap, child: card);
     }
     return card;
-  }
-
-  String _subtitle() {
-    final total = block.words.length;
-    switch (block.status) {
-      case BlockStatus.completed:
-        return '$total слов · пройден';
-      case BlockStatus.available:
-        final learned = controller.learnedInBlock(block);
-        return learned > 0
-            ? '$learned / $total · продолжить'
-            : '$total слов · начать';
-      case BlockStatus.locked:
-        return 'Откроется после блока ${block.index}';
-    }
   }
 }
 
 class _BlockMarker extends StatelessWidget {
-  const _BlockMarker({required this.block, required this.number});
+  const _BlockMarker({required this.status, required this.number});
 
-  final WordBlock block;
+  final BlockStatus status;
   final int number;
 
   @override
   Widget build(BuildContext context) {
-    switch (block.status) {
+    switch (status) {
       case BlockStatus.completed:
         return Container(
           width: 36,
@@ -370,10 +429,8 @@ class _BlockMarker extends StatelessWidget {
             shape: BoxShape.circle,
           ),
           alignment: Alignment.center,
-          child: Text(
-            '$number',
-            style: AppTextStyles.label.copyWith(color: AppColors.onAccent),
-          ),
+          child: Text('$number',
+              style: AppTextStyles.label.copyWith(color: AppColors.onAccent)),
         );
       case BlockStatus.locked:
         return Container(
@@ -392,23 +449,146 @@ class _BlockMarker extends StatelessWidget {
   }
 }
 
+/// Содержимое вкладки «Фразы», когда они ещё заперты (по макету 08).
+class _PhrasesLocked extends GetView<TopicDetailController> {
+  const _PhrasesLocked();
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        const SizedBox(height: AppDimens.spaceLg),
+        Container(
+          width: 80,
+          height: 80,
+          decoration: const BoxDecoration(
+            color: AppColors.surfaceRaised,
+            shape: BoxShape.circle,
+          ),
+          child: const Center(
+            child: AppIcon(AppIcons.lock,
+                color: AppColors.textMuted, size: 32),
+          ),
+        ),
+        const SizedBox(height: AppDimens.spaceLg),
+        Text('Фразы заперты', style: AppTextStyles.title),
+        const SizedBox(height: AppDimens.spaceSm),
+        Text(
+          'Выучи все слова темы «${controller.topic.title}»,\nчтобы открыть ${controller.totalPhrases.value} фраз',
+          textAlign: TextAlign.center,
+          style: AppTextStyles.bodyRegular
+              .copyWith(color: AppColors.textSecondary),
+        ),
+        const SizedBox(height: AppDimens.spaceXl),
+        Container(
+          padding: const EdgeInsets.all(AppDimens.spaceLg),
+          decoration: BoxDecoration(
+            color: AppColors.surfaceRaised,
+            borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Expanded(
+                    child: Text('Слова темы выучены',
+                        style: AppTextStyles.label),
+                  ),
+                  Text(
+                    '${controller.learnedWords.value} / ${controller.totalWords.value}',
+                    style: AppTextStyles.label
+                        .copyWith(color: AppColors.accent),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppDimens.spaceSm),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(AppDimens.radiusBadge),
+                child: LinearProgressIndicator(
+                  value: controller.percent,
+                  minHeight: 8,
+                  backgroundColor: AppColors.line,
+                  valueColor:
+                      const AlwaysStoppedAnimation(AppColors.accent),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: AppDimens.spaceLg),
+        if (controller.activeBlock != null)
+          PrimaryButton(
+            label: 'Доучить слова · осталось ${controller.remainingWords}',
+            onPressed: () =>
+                _startWordBlock(controller, controller.activeBlock!.index),
+          ),
+        const SizedBox(height: AppDimens.spaceMd),
+        ...List.generate(
+          3,
+          (_) => Padding(
+            padding: const EdgeInsets.only(bottom: AppDimens.spaceMd),
+            child: Container(
+              height: 56,
+              decoration: BoxDecoration(
+                color: AppColors.surfaceRaised,
+                borderRadius: BorderRadius.circular(AppDimens.radiusMd),
+              ),
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppDimens.spaceLg,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text('• • • • • • •',
+                          style: AppTextStyles.label
+                              .copyWith(color: AppColors.textMuted)),
+                    ),
+                    const AppIcon(AppIcons.lock,
+                        color: AppColors.textMuted, size: AppDimens.iconSm),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class _BottomCta extends GetView<TopicDetailController> {
   const _BottomCta();
 
   @override
   Widget build(BuildContext context) {
-    final active = controller.activeBlock;
+    // Вкладка слов: CTA активного блока слов.
+    if (controller.activeTab.value == 0) {
+      final active = controller.activeBlock;
+      if (active == null) return const SizedBox.shrink();
+      final learned = controller.learnedInBlock(active);
+      final label = learned > 0
+          ? 'Продолжить блок ${active.index + 1}'
+          : 'Начать блок ${active.index + 1}';
+      return Padding(
+        padding: const EdgeInsets.all(AppDimens.spaceLg),
+        child: PrimaryButton(
+          label: label,
+          iconName: AppIcons.play,
+          onPressed: () => _startWordBlock(controller, active.index),
+        ),
+      );
+    }
+    // Вкладка фраз: CTA только если фразы открыты.
+    if (!controller.phrasesUnlocked.value) return const SizedBox.shrink();
+    final active = controller.activePhraseBlock;
     if (active == null) return const SizedBox.shrink();
-    final learned = controller.learnedInBlock(active);
-    final label = learned > 0
-        ? 'Продолжить блок ${active.index + 1}'
-        : 'Начать блок ${active.index + 1}';
     return Padding(
       padding: const EdgeInsets.all(AppDimens.spaceLg),
       child: PrimaryButton(
-        label: label,
+        label: 'Собрать блок ${active.index + 1}',
         iconName: AppIcons.play,
-        onPressed: () => _startBlock(controller, active.index),
+        onPressed: () => _startPhraseBlock(controller, active.index),
       ),
     );
   }
@@ -433,4 +613,20 @@ class _CircleBack extends StatelessWidget {
       ),
     );
   }
+}
+
+/// Запускает блок слов.
+void _startWordBlock(TopicDetailController controller, int blockIndex) {
+  Get.toNamed<void>(
+    Routes.learn,
+    arguments: LessonArgs(topic: controller.topic, blockIndex: blockIndex),
+  );
+}
+
+/// Запускает блок фраз.
+void _startPhraseBlock(TopicDetailController controller, int blockIndex) {
+  Get.toNamed<void>(
+    Routes.phraseLearn,
+    arguments: LessonArgs(topic: controller.topic, blockIndex: blockIndex),
+  );
 }

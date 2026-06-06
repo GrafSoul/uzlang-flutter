@@ -12,6 +12,10 @@ import '../../features/learn/test_binding.dart';
 import '../../features/learn/test_page.dart';
 import '../../features/onboarding/onboarding_binding.dart';
 import '../../features/onboarding/onboarding_page.dart';
+import '../../features/phrases/phrase_learn_binding.dart';
+import '../../features/phrases/phrase_learn_page.dart';
+import '../../features/phrases/phrase_test_binding.dart';
+import '../../features/phrases/phrase_test_page.dart';
 import '../../features/topic_detail/topic_detail_binding.dart';
 import '../../features/topic_detail/topic_detail_page.dart';
 import '../../features/topics/topics_binding.dart';
@@ -69,6 +73,16 @@ abstract final class AppPages {
       name: Routes.review,
       page: () => const ReviewPage(),
       binding: ReviewBinding(),
+    ),
+    GetPage<dynamic>(
+      name: Routes.phraseLearn,
+      page: () => const PhraseLearnPage(),
+      binding: PhraseLearnBinding(),
+    ),
+    GetPage<dynamic>(
+      name: Routes.phraseTest,
+      page: () => const PhraseTestPage(),
+      binding: PhraseTestBinding(),
     ),
   ];
 }
