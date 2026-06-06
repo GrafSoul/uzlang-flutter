@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+#
+# UzLang — запуск одной командой: поднять эмулятор (если не запущен) и
+# стартовать flutter run с hot reload.
+#
+# Использование:
+#   ./run            # эмулятор Pixel 6 Pro API 33 + flutter run
+#   ./run -d chrome  # любые доп. аргументы уходят во flutter run
+#
+set -euo pipefail
+
+EMULATOR="${UZLANG_EMULATOR:-Pixel_6_Pro_API_33}"
+ADB="${ANDROID_HOME:-$HOME/Library/Android/sdk}/platform-tools/adb"
+
+cd "$(dirname "$0")"
+
+# 1) Эмулятор: поднять, только если ни одно Android-устройство не подключено.
+if [ -x "$ADB" ] && ! "$ADB" devices | grep -qE 'emulator-[0-9]+\s+device'; then
+  echo "▶ Запускаю эмулятор $EMULATOR…"
+  flutter emulators --launch "$EMULATOR"
+  echo "⏳ Жду загрузки Android…"
+  "$ADB" wait-for-device
+  until [ "$("$ADB" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ]; do
+    sleep 2
+  done
+  echo "✅ Эмулятор готов."
+fi
+
+# 2) flutter run (интерактивно: r — hot reload, R — hot restart, q — выход).
+echo "▶ flutter run…"
+exec flutter run "$@"
