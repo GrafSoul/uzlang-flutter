@@ -1,7 +1,9 @@
 import 'package:get/get.dart';
 
+import '../../app/routes/app_routes.dart';
 import '../../core/services/settings_service.dart';
 import '../../core/services/user_service.dart';
+import '../../domain/entities/enums.dart';
 import '../../domain/entities/topic_progress.dart';
 import '../../domain/entities/user_stats.dart';
 import '../../domain/repositories/progress_repository.dart';
@@ -36,6 +38,9 @@ class HomeController extends GetxController {
   /// Темы с прогрессом.
   final RxList<TopicProgress> topics = <TopicProgress>[].obs;
 
+  /// Сколько карточек к повтору сегодня.
+  final RxInt dueCount = 0.obs;
+
   /// Идёт ли загрузка.
   final RxBool isLoading = true.obs;
 
@@ -65,6 +70,22 @@ class HomeController extends GetxController {
     dailyGoalMinutes.value = _settings.dailyGoalMinutes;
     stats.value = await _progress.getStats(userId);
     topics.value = await _topicProgress.buildAll(userId);
+    dueCount.value =
+        (await _progress.getDueCards(userId, CardKind.word, DateTime.now()))
+            .length;
     isLoading.value = false;
+  }
+
+  /// Действие карточки «Продолжить»: если есть карточки к повтору — повтор,
+  /// иначе переход к текущей теме.
+  void openContinue() {
+    if (dueCount.value > 0) {
+      Get.toNamed<void>(Routes.review);
+      return;
+    }
+    final tp = continueTopic;
+    if (tp != null) {
+      Get.toNamed<void>(Routes.topicDetail, arguments: tp.topic);
+    }
   }
 }

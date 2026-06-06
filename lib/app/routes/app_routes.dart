@@ -15,4 +15,19 @@ abstract final class Routes {
 
   /// Тема — обзор (блоки слов/фраз).
   static const String topicDetail = '/topic';
+
+  /// Слова — Учить (свайп-карточки).
+  static const String learn = '/learn';
+
+  /// Слова — Тест (выбор перевода).
+  static const String test = '/test';
+
+  /// Результат блока.
+  static const String result = '/result';
+
+  /// Нет жизней.
+  static const String noLives = '/no-lives';
+
+  /// Слова — Повтор (FSRS due).
+  static const String review = '/review';
 }

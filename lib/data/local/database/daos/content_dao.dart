@@ -42,6 +42,12 @@ class ContentDao extends DatabaseAccessor<AppDatabase> with _$ContentDaoMixin {
         .get();
   }
 
+  /// Слова по списку идентификаторов (для повтора due-карточек).
+  Future<List<WordRow>> getWordsByIds(List<int> ids) {
+    if (ids.isEmpty) return Future.value(const []);
+    return (select(words)..where((w) => w.id.isIn(ids))).get();
+  }
+
   /// Количество слов в теме.
   Future<int> countWordsByTopic(int topicId) {
     return (selectOnly(words)

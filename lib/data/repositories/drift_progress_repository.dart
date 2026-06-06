@@ -1,7 +1,10 @@
+import 'package:drift/drift.dart' show Value;
+
 import '../../domain/entities/card_progress.dart';
 import '../../domain/entities/enums.dart';
 import '../../domain/entities/user_stats.dart';
 import '../../domain/repositories/progress_repository.dart';
+import '../local/database/app_database.dart';
 import '../local/database/daos/progress_dao.dart';
 import '../local/database/mappers.dart';
 
@@ -68,5 +71,36 @@ class DriftProgressRepository implements ProgressRepository {
         .where((b) => b.completedAt != null)
         .map((b) => b.blockIndex)
         .toSet();
+  }
+
+  @override
+  Future<void> completeBlock(
+    String userId,
+    int topicId,
+    CardKind scope,
+    int blockIndex,
+    double accuracy,
+  ) {
+    return _dao.markBlockCompleted(
+      userId,
+      topicId,
+      scope,
+      blockIndex,
+      accuracy,
+      DateTime.now().toUtc().millisecondsSinceEpoch,
+    );
+  }
+
+  @override
+  Future<void> saveStats(String userId, UserStats stats) {
+    return _dao.upsertStats(
+      UserStatsCompanion.insert(
+        userId: userId,
+        xp: Value(stats.xp),
+        streakCurrent: Value(stats.streakCurrent),
+        streakBest: Value(stats.streakBest),
+        lastActiveDay: Value(stats.lastActiveDay),
+      ),
+    );
   }
 }

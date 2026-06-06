@@ -19,6 +19,9 @@ abstract interface class ContentRepository {
   /// Количество слов в теме.
   Future<int> getWordCount(int topicId);
 
+  /// Слова по списку идентификаторов.
+  Future<List<Word>> getWordsByIds(List<int> ids);
+
   /// Фразы темы по порядку.
   Future<List<Phrase>> getPhrases(int topicId);
 }

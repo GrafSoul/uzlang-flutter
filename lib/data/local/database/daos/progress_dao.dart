@@ -16,7 +16,8 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
   /// Создаёт DAO, привязанный к базе [db].
   ProgressDao(super.db);
 
-  /// Сколько слов темы выучено (карточки в состоянии review) у пользователя.
+  /// Сколько слов темы выучено: положительных ответов больше провалов
+  /// (`reps > lapses`) — «Знаю» засчитывает, «Ещё учу» нет.
   Future<int> countLearnedWords(String userId, int topicId) async {
     final count = cardProgress.id.count();
     final query = selectOnly(cardProgress).join([
@@ -25,7 +26,7 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
       ..addColumns([count])
       ..where(cardProgress.userId.equals(userId) &
           cardProgress.cardKind.equalsValue(CardKind.word) &
-          cardProgress.state.equalsValue(SrState.review) &
+          cardProgress.reps.isBiggerThan(cardProgress.lapses) &
           words.topicId.equals(topicId));
     final row = await query.getSingle();
     return row.read(count) ?? 0;
@@ -93,5 +94,26 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
   /// Вставляет/обновляет прогресс блока.
   Future<void> upsertBlock(BlockProgressCompanion block) {
     return into(blockProgress).insertOnConflictUpdate(block);
+  }
+
+  /// Отмечает блок пройденным (точность + момент завершения).
+  Future<void> markBlockCompleted(
+    String userId,
+    int topicId,
+    CardKind scope,
+    int blockIndex,
+    double accuracy,
+    int completedAtMs,
+  ) {
+    return into(blockProgress).insertOnConflictUpdate(
+      BlockProgressCompanion.insert(
+        userId: Value(userId),
+        topicId: topicId,
+        scope: scope,
+        blockIndex: blockIndex,
+        accuracy: Value(accuracy),
+        completedAt: Value(completedAtMs),
+      ),
+    );
   }
 }

@@ -11,7 +11,9 @@ import '../../data/repositories/drift_progress_repository.dart';
 import '../../domain/repositories/content_repository.dart';
 import '../../domain/repositories/progress_repository.dart';
 import '../../domain/services/fsrs_scheduler.dart';
+import '../../domain/services/gamification_service.dart';
 import '../../domain/services/learning_service.dart';
+import '../../domain/services/lesson_service.dart';
 import '../../domain/services/sr_scheduler.dart';
 import '../../domain/services/topic_progress_service.dart';
 
@@ -48,6 +50,13 @@ class InitialBinding extends Bindings {
         Get.find<ContentRepository>(),
         Get.find<ProgressRepository>(),
       ),
+      permanent: true,
+    );
+
+    final gamification = GamificationService(Get.find<ProgressRepository>());
+    Get.put<GamificationService>(gamification, permanent: true);
+    Get.put<LessonService>(
+      LessonService(Get.find<ProgressRepository>(), gamification),
       permanent: true,
     );
   }

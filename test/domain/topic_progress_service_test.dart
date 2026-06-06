@@ -31,6 +31,9 @@ class _FakeContent implements ContentRepository {
 
   @override
   Future<List<Phrase>> getPhrases(int topicId) => throw UnimplementedError();
+
+  @override
+  Future<List<Word>> getWordsByIds(List<int> ids) => throw UnimplementedError();
 }
 
 /// Фейковый прогресс-репозиторий: число выученных слов по теме.
@@ -62,6 +65,15 @@ class _FakeProgress implements ProgressRepository {
   @override
   Future<List<CardProgress>> getDueCards(
           String userId, CardKind kind, DateTime now) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> completeBlock(String userId, int topicId, CardKind scope,
+          int blockIndex, double accuracy) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> saveStats(String userId, UserStats stats) =>
       throw UnimplementedError();
 }
 

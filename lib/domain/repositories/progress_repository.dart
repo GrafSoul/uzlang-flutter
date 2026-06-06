@@ -32,4 +32,16 @@ abstract interface class ProgressRepository {
     int topicId,
     CardKind scope,
   );
+
+  /// Отмечает блок пройденным.
+  Future<void> completeBlock(
+    String userId,
+    int topicId,
+    CardKind scope,
+    int blockIndex,
+    double accuracy,
+  );
+
+  /// Сохраняет статистику пользователя.
+  Future<void> saveStats(String userId, UserStats stats);
 }

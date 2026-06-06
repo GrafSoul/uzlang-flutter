@@ -1,0 +1,95 @@
+import 'package:get/get.dart';
+
+import '../../app/routes/app_routes.dart';
+import '../../core/services/audio_service.dart';
+import '../../core/services/user_service.dart';
+import '../../domain/entities/card_progress.dart';
+import '../../domain/entities/enums.dart';
+import '../../domain/entities/word.dart';
+import '../../domain/repositories/content_repository.dart';
+import '../../domain/repositories/progress_repository.dart';
+import '../../domain/services/learning_service.dart';
+import '../../domain/services/sr_scheduler.dart';
+import 'lesson_args.dart';
+
+/// Контроллер экрана «Слова — Учить» (свайп-карточки блока).
+///
+/// Прогоняет слова блока по одному. «Знаю» → оценка good, «Ещё учу» → again;
+/// каждая оценка пишется в прогресс через [SrScheduler]. После последнего слова
+/// ведёт на тест блока.
+class LearnController extends GetxController {
+  /// Создаёт контроллер.
+  LearnController(
+    this._content,
+    this._progress,
+    this._scheduler,
+    this._user,
+    this._audio,
+  );
+
+  final ContentRepository _content;
+  final ProgressRepository _progress;
+  final SrScheduler _scheduler;
+  final UserService _user;
+  final AudioService _audio;
+
+  /// Аргументы сессии.
+  late final LessonArgs args;
+
+  /// Слова блока.
+  final RxList<Word> words = <Word>[].obs;
+
+  /// Индекс текущей карточки.
+  final RxInt index = 0.obs;
+
+  /// Идёт ли загрузка.
+  final RxBool isLoading = true.obs;
+
+  /// Текущее слово.
+  Word get current => words[index.value];
+
+  @override
+  void onInit() {
+    super.onInit();
+    args = Get.arguments as LessonArgs;
+    load();
+  }
+
+  /// Загружает слова блока.
+  Future<void> load() async {
+    isLoading.value = true;
+    final all = await _content.getWords(args.topic.id);
+    final start = args.blockIndex * LearningService.blockSize;
+    final end = (start + LearningService.blockSize).clamp(0, all.length);
+    words.value = start < all.length ? all.sublist(start, end) : [];
+    isLoading.value = false;
+  }
+
+  /// Озвучивает текущее слово.
+  Future<void> playAudio() => _audio.playWord(current.uz);
+
+  /// Отмечает текущее слово как «знаю»/«ещё учу» и переходит дальше.
+  Future<void> mark({required bool known}) async {
+    final userId = _user.localUserId;
+    final existing = await _progress.getProgress(
+          userId,
+          CardKind.word,
+          current.id,
+        ) ??
+        freshCardProgress(CardKind.word, current.id);
+    final updated = _scheduler.review(
+      existing,
+      known ? Rating.good : Rating.again,
+    );
+    await _progress.saveProgress(userId, updated);
+    _advance();
+  }
+
+  void _advance() {
+    if (index.value < words.length - 1) {
+      index.value++;
+    } else {
+      Get.offNamed<void>(Routes.test, arguments: args);
+    }
+  }
+}

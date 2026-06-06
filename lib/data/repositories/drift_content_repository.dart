@@ -33,6 +33,12 @@ class DriftContentRepository implements ContentRepository {
   Future<int> getWordCount(int topicId) => _dao.countWordsByTopic(topicId);
 
   @override
+  Future<List<Word>> getWordsByIds(List<int> ids) async {
+    final rows = await _dao.getWordsByIds(ids);
+    return rows.map((r) => r.toDomain()).toList();
+  }
+
+  @override
   Future<List<Phrase>> getPhrases(int topicId) async {
     final rows = await _dao.getPhrasesByTopic(topicId);
     return rows.map((r) => r.toDomain()).toList();

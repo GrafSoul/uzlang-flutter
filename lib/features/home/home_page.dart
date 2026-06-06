@@ -181,7 +181,7 @@ class _ContinueCard extends GetView<HomeController> {
       color: AppColors.accent,
       borderRadius: BorderRadius.circular(AppDimens.radiusXl),
       child: InkWell(
-        onTap: () => _openTopic(tp),
+        onTap: controller.openContinue,
         borderRadius: BorderRadius.circular(AppDimens.radiusXl),
         child: Padding(
           padding: const EdgeInsets.all(AppDimens.spaceLg),

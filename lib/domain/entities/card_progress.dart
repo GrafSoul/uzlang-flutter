@@ -43,3 +43,13 @@ abstract class CardProgress with _$CardProgress {
     @Default(0) int lapses,
   }) = _CardProgress;
 }
+
+/// Создаёт начальный прогресс новой карточки (ещё не изучалась).
+CardProgress freshCardProgress(CardKind kind, int cardId, {DateTime? now}) {
+  return CardProgress(
+    kind: kind,
+    cardId: cardId,
+    state: SrState.newCard,
+    due: (now ?? DateTime.now()).toUtc(),
+  );
+}

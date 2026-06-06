@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../app/routes/app_routes.dart';
 import '../../core/theme/theme.dart';
 import '../../domain/entities/word_block.dart';
+import '../learn/lesson_args.dart';
 import '../shared/widgets/widgets.dart';
 import 'topic_detail_controller.dart';
+
+/// Запускает учебную сессию блока [blockIndex] темы.
+void _startBlock(TopicDetailController controller, int blockIndex) {
+  Get.toNamed<void>(
+    Routes.learn,
+    arguments: LessonArgs(topic: controller.topic, blockIndex: blockIndex),
+  );
+}
 
 /// Экран «Тема — обзор» — по макету Figma «03 · Тема — обзор».
 class TopicDetailPage extends GetView<TopicDetailController> {
@@ -250,7 +260,7 @@ class _BlockCard extends GetView<TopicDetailController> {
     final n = block.index + 1;
     final isActive = block.status == BlockStatus.available;
 
-    return Container(
+    final card = Container(
       padding: const EdgeInsets.all(AppDimens.spaceLg),
       decoration: BoxDecoration(
         color: isActive ? AppColors.accentTint : AppColors.surfaceRaised,
@@ -303,6 +313,14 @@ class _BlockCard extends GetView<TopicDetailController> {
         ],
       ),
     );
+
+    if (isActive) {
+      return GestureDetector(
+        onTap: () => _startBlock(controller, block.index),
+        child: card,
+      );
+    }
+    return card;
   }
 
   String _subtitle() {
@@ -390,7 +408,7 @@ class _BottomCta extends GetView<TopicDetailController> {
       child: PrimaryButton(
         label: label,
         iconName: AppIcons.play,
-        onPressed: () {},
+        onPressed: () => _startBlock(controller, active.index),
       ),
     );
   }
