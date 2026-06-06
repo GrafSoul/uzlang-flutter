@@ -16,16 +16,16 @@ cd "$(dirname "$0")"
 
 # 1) Эмулятор: поднять, только если ни одно Android-устройство не подключено.
 if [ -x "$ADB" ] && ! "$ADB" devices | grep -qE 'emulator-[0-9]+\s+device'; then
-  echo "▶ Запускаю эмулятор $EMULATOR…"
+  echo "Запускаю эмулятор ${EMULATOR}..."
   flutter emulators --launch "$EMULATOR"
-  echo "⏳ Жду загрузки Android…"
+  echo "Жду загрузки Android..."
   "$ADB" wait-for-device
   until [ "$("$ADB" shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ]; do
     sleep 2
   done
-  echo "✅ Эмулятор готов."
+  echo "Эмулятор готов."
 fi
 
-# 2) flutter run (интерактивно: r — hot reload, R — hot restart, q — выход).
-echo "▶ flutter run…"
+# 2) flutter run (интерактивно: r - hot reload, R - hot restart, q - выход).
+echo "flutter run..."
 exec flutter run "$@"
