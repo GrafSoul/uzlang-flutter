@@ -6,6 +6,8 @@ class UserStats {
     required this.streakCurrent,
     required this.streakBest,
     this.lastActiveDay,
+    this.todayXp = 0,
+    this.todayDate,
   });
 
   /// Накопленный опыт.
@@ -19,6 +21,12 @@ class UserStats {
 
   /// Последний активный день (`yyyy-MM-dd`).
   final String? lastActiveDay;
+
+  /// XP, заработанный сегодня (для прогресса дневной цели).
+  final int todayXp;
+
+  /// День, к которому относится [todayXp].
+  final String? todayDate;
 
   /// Пустая статистика нового пользователя.
   static const UserStats empty =

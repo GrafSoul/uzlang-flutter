@@ -153,6 +153,12 @@ class UserStats extends Table {
   /// Дневная цель в минутах.
   IntColumn get dailyGoalMinutes => integer().withDefault(const Constant(10))();
 
+  /// XP, заработанный за текущий день (для прогресса дневной цели).
+  IntColumn get todayXp => integer().withDefault(const Constant(0))();
+
+  /// День, к которому относится [todayXp] (`yyyy-MM-dd`).
+  TextColumn get todayDate => text().nullable()();
+
   @override
   Set<Column<Object>> get primaryKey => {userId};
 }

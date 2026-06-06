@@ -26,11 +26,18 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
         onCreate: (m) => m.createAll(),
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            // v2: дневной XP для прогресса дневной цели.
+            await m.addColumn(userStats, userStats.todayXp);
+            await m.addColumn(userStats, userStats.todayDate);
+          }
+        },
         beforeOpen: (details) async {
           // Включаем внешние ключи (по умолчанию в SQLite выключены).
           await customStatement('PRAGMA foreign_keys = ON');

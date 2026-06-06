@@ -96,4 +96,51 @@ void main() {
       expect(s.streakBest, 7);
     });
   });
+
+  group('GamificationService дневной XP', () {
+    test('первый блок дня: todayXp = 50', () async {
+      final now = DateTime(2026, 1, 10);
+      final repo = _FakeProgress(UserStats.empty);
+      final service = GamificationService(repo);
+
+      final s = await service.awardBlockCompletion('local', now: now);
+
+      expect(s.todayXp, 50);
+      expect(s.todayDate, _key(now));
+    });
+
+    test('второй блок в тот же день: todayXp накапливается', () async {
+      final now = DateTime(2026, 1, 10);
+      final repo = _FakeProgress(UserStats(
+        xp: 50,
+        streakCurrent: 1,
+        streakBest: 1,
+        lastActiveDay: _key(now),
+        todayXp: 50,
+        todayDate: _key(now),
+      ));
+      final service = GamificationService(repo);
+
+      final s = await service.awardBlockCompletion('local', now: now);
+
+      expect(s.todayXp, 100);
+    });
+
+    test('новый день: todayXp сбрасывается', () async {
+      final now = DateTime(2026, 1, 10);
+      final repo = _FakeProgress(UserStats(
+        xp: 200,
+        streakCurrent: 1,
+        streakBest: 3,
+        lastActiveDay: _key(now.subtract(const Duration(days: 1))),
+        todayXp: 150,
+        todayDate: _key(now.subtract(const Duration(days: 1))),
+      ));
+      final service = GamificationService(repo);
+
+      final s = await service.awardBlockCompletion('local', now: now);
+
+      expect(s.todayXp, 50);
+    });
+  });
 }

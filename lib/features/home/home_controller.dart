@@ -7,6 +7,7 @@ import '../../domain/entities/enums.dart';
 import '../../domain/entities/topic_progress.dart';
 import '../../domain/entities/user_stats.dart';
 import '../../domain/repositories/progress_repository.dart';
+import '../../domain/services/gamification_service.dart';
 import '../../domain/services/topic_progress_service.dart';
 
 /// Контроллер главного экрана.
@@ -68,7 +69,11 @@ class HomeController extends GetxController {
 
     userName.value = _user.name;
     dailyGoalMinutes.value = _settings.dailyGoalMinutes;
-    stats.value = await _progress.getStats(userId);
+    final s = await _progress.getStats(userId);
+    stats.value = s;
+    final today = _todayKey();
+    todayMinutes.value =
+        s.todayDate == today ? GamificationService.minutesFromXp(s.todayXp) : 0;
     topics.value = await _topicProgress.buildAll(userId);
     dueCount.value =
         (await _progress.getDueCards(userId, CardKind.word, DateTime.now()))
@@ -87,5 +92,10 @@ class HomeController extends GetxController {
     if (tp != null) {
       Get.toNamed<void>(Routes.topicDetail, arguments: tp.topic);
     }
+  }
+
+  String _todayKey() {
+    final d = DateTime.now();
+    return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
   }
 }

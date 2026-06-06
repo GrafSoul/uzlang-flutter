@@ -30,15 +30,25 @@ class GamificationService {
       streak = 1;
     }
 
+    final todayXp = (s.todayDate == todayKey ? s.todayXp : 0) + blockXp;
+
     final updated = UserStats(
       xp: s.xp + blockXp,
       streakCurrent: streak,
       streakBest: max(s.streakBest, streak),
       lastActiveDay: todayKey,
+      todayXp: todayXp,
+      todayDate: todayKey,
     );
     await _progress.saveStats(userId, updated);
     return updated;
   }
+
+  /// Целевой XP на день из дневной цели в минутах (≈10 XP за минуту).
+  static int dailyGoalXp(int dailyGoalMinutes) => dailyGoalMinutes * 10;
+
+  /// Оценка пройденных минут из заработанного XP (обратное к [dailyGoalXp]).
+  static int minutesFromXp(int xp) => (xp / 10).round();
 
   String _dayKey(DateTime d) =>
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';

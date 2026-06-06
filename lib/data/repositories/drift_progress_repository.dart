@@ -52,6 +52,8 @@ class DriftProgressRepository implements ProgressRepository {
       streakCurrent: row.streakCurrent,
       streakBest: row.streakBest,
       lastActiveDay: row.lastActiveDay,
+      todayXp: row.todayXp,
+      todayDate: row.todayDate,
     );
   }
 
@@ -100,6 +102,8 @@ class DriftProgressRepository implements ProgressRepository {
         streakCurrent: Value(stats.streakCurrent),
         streakBest: Value(stats.streakBest),
         lastActiveDay: Value(stats.lastActiveDay),
+        todayXp: Value(stats.todayXp),
+        todayDate: Value(stats.todayDate),
       ),
     );
   }
