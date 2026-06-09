@@ -61,6 +61,29 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
+  /// Всего слов выучено пользователем (по всем темам): reps > lapses.
+  Future<int> countAllLearnedWords(String userId) async {
+    final count = cardProgress.id.count();
+    final query = selectOnly(cardProgress)
+      ..addColumns([count])
+      ..where(cardProgress.userId.equals(userId) &
+          cardProgress.cardKind.equalsValue(CardKind.word) &
+          cardProgress.reps.isBiggerThan(cardProgress.lapses));
+    final row = await query.getSingle();
+    return row.read(count) ?? 0;
+  }
+
+  /// Средняя точность по завершённым блокам (0..1).
+  Future<double> averageAccuracy(String userId) async {
+    final avg = blockProgress.accuracy.avg();
+    final query = selectOnly(blockProgress)
+      ..addColumns([avg])
+      ..where(blockProgress.userId.equals(userId) &
+          blockProgress.completedAt.isNotNull());
+    final row = await query.getSingleOrNull();
+    return row?.read(avg) ?? 0.0;
+  }
+
   /// Вставляет/обновляет прогресс карточки (по уникальному ключу).
   Future<void> upsertProgress(CardProgressCompanion progress) {
     return into(cardProgress).insertOnConflictUpdate(progress);

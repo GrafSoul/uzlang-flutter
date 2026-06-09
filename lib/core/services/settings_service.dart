@@ -18,6 +18,7 @@ class SettingsService {
   static const String _kSound = 'settings.soundEnabled';
   static const String _kTheme = 'settings.themeMode';
   static const String _kOnboarding = 'settings.onboardingCompleted';
+  static const String _kReminders = 'settings.remindersEnabled';
 
   /// Режим письменности (по умолчанию кириллица).
   ScriptMode get scriptMode =>
@@ -45,6 +46,13 @@ class SettingsService {
 
   /// Сохраняет режим темы.
   Future<void> setThemeMode(ThemeMode mode) => _box.write(_kTheme, mode.index);
+
+  /// Включены ли напоминания (по умолчанию да).
+  bool get remindersEnabled => _box.read<bool>(_kReminders) ?? true;
+
+  /// Переключает напоминания.
+  Future<void> setRemindersEnabled(bool enabled) =>
+      _box.write(_kReminders, enabled);
 
   /// Пройден ли онбординг.
   bool get onboardingCompleted => _box.read<bool>(_kOnboarding) ?? false;

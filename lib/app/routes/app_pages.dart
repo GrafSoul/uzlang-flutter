@@ -12,6 +12,10 @@ import '../../features/learn/test_binding.dart';
 import '../../features/learn/test_page.dart';
 import '../../features/onboarding/onboarding_binding.dart';
 import '../../features/onboarding/onboarding_page.dart';
+import '../../features/profile/profile_binding.dart';
+import '../../features/profile/profile_page.dart';
+import '../../features/progress/progress_binding.dart';
+import '../../features/progress/progress_page.dart';
 import '../../features/phrases/phrase_learn_binding.dart';
 import '../../features/phrases/phrase_learn_page.dart';
 import '../../features/phrases/phrase_test_binding.dart';
@@ -40,6 +44,16 @@ abstract final class AppPages {
       name: Routes.home,
       page: () => const HomePage(),
       binding: HomeBinding(),
+    ),
+    GetPage<dynamic>(
+      name: Routes.progress,
+      page: () => const ProgressPage(),
+      binding: ProgressBinding(),
+    ),
+    GetPage<dynamic>(
+      name: Routes.profile,
+      page: () => const ProfilePage(),
+      binding: ProfileBinding(),
     ),
     GetPage<dynamic>(
       name: Routes.topics,

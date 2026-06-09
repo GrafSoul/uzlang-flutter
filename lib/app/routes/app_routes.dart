@@ -10,6 +10,12 @@ abstract final class Routes {
   /// Главный экран.
   static const String home = '/home';
 
+  /// Прогресс / статистика.
+  static const String progress = '/progress';
+
+  /// Профиль / настройки.
+  static const String profile = '/profile';
+
   /// Выбор темы (список тем по секциям).
   static const String topics = '/topics';
 

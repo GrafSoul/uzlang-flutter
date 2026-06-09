@@ -94,6 +94,14 @@ class DriftProgressRepository implements ProgressRepository {
   }
 
   @override
+  Future<int> getTotalLearnedWords(String userId) =>
+      _dao.countAllLearnedWords(userId);
+
+  @override
+  Future<double> getAverageAccuracy(String userId) =>
+      _dao.averageAccuracy(userId);
+
+  @override
   Future<void> saveStats(String userId, UserStats stats) {
     return _dao.upsertStats(
       UserStatsCompanion.insert(

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 
+import '../../../app/routes/app_routes.dart';
 import '../../../core/theme/theme.dart';
 import 'app_icon.dart';
 
@@ -75,6 +77,15 @@ class _NavItem extends StatelessWidget {
   final String icon;
   final String label;
 
+  void _go(AppTab tab) {
+    final route = switch (tab) {
+      AppTab.learn => Routes.home,
+      AppTab.progress => Routes.progress,
+      AppTab.profile => Routes.profile,
+    };
+    Get.offAllNamed<void>(route);
+  }
+
   @override
   Widget build(BuildContext context) {
     // Активность определяется по предку (передаётся через InheritedWidget темы
@@ -83,7 +94,7 @@ class _NavItem extends StatelessWidget {
     final active = nav?.current == tab;
     final color = active ? AppColors.accent : AppColors.textMuted;
     return InkWell(
-      onTap: () {},
+      onTap: active ? null : () => _go(tab),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: AppDimens.spaceXs),
         child: Column(

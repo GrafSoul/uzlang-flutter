@@ -75,6 +75,13 @@ class _FakeProgress implements ProgressRepository {
   @override
   Future<void> saveStats(String userId, UserStats stats) =>
       throw UnimplementedError();
+
+  @override
+  Future<int> getTotalLearnedWords(String userId) => throw UnimplementedError();
+
+  @override
+  Future<double> getAverageAccuracy(String userId) =>
+      throw UnimplementedError();
 }
 
 Topic _topic(int id) => Topic(

@@ -9,10 +9,13 @@ import 'settings_service.dart';
 /// Хранит стабильный `localUserId` (генерится при первом запуске) и имя.
 /// Это шов под авторизацию: позже `localUserId` привяжется к аккаунту.
 class UserService {
-  /// Создаёт сервис; при первом запуске генерирует `localUserId`.
+  /// Создаёт сервис; при первом запуске фиксирует `localUserId` и дату входа.
   UserService(this._box, this._settings) {
     if (_box.read<String>(_kId) == null) {
       _box.write(_kId, 'local-${DateTime.now().microsecondsSinceEpoch}');
+    }
+    if (_box.read<String>(_kJoin) == null) {
+      _box.write(_kJoin, DateTime.now().toIso8601String());
     }
   }
 
@@ -21,6 +24,32 @@ class UserService {
 
   static const String _kId = 'user.localId';
   static const String _kName = 'user.name';
+  static const String _kJoin = 'user.joinedAt';
+
+  static const List<String> _monthsGenitive = [
+    'января',
+    'февраля',
+    'марта',
+    'апреля',
+    'мая',
+    'июня',
+    'июля',
+    'августа',
+    'сентября',
+    'октября',
+    'ноября',
+    'декабря',
+  ];
+
+  /// Дата регистрации (первый запуск).
+  DateTime get joinedAt =>
+      DateTime.tryParse(_box.read<String>(_kJoin) ?? '') ?? DateTime.now();
+
+  /// Подпись «с {месяц} {год}».
+  String get joinedLabel {
+    final d = joinedAt;
+    return 'с ${_monthsGenitive[d.month - 1]} ${d.year}';
+  }
 
   /// Стабильный анонимный идентификатор пользователя.
   String get localUserId => _box.read<String>(_kId)!;

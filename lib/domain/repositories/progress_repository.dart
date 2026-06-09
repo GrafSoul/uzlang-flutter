@@ -44,4 +44,10 @@ abstract interface class ProgressRepository {
 
   /// Сохраняет статистику пользователя.
   Future<void> saveStats(String userId, UserStats stats);
+
+  /// Всего слов выучено пользователем (по всем темам).
+  Future<int> getTotalLearnedWords(String userId);
+
+  /// Средняя точность по завершённым блокам (0..1).
+  Future<double> getAverageAccuracy(String userId);
 }
