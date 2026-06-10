@@ -32,6 +32,23 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
     return row.read(count) ?? 0;
   }
 
+  /// Идентификаторы выученных слов темы (`reps > lapses`).
+  ///
+  /// Нужен для точного подсчёта выученного по блокам: вычитание из общего
+  /// счётчика приписывало бы прогресс не тем блокам.
+  Future<Set<int>> learnedWordIds(String userId, int topicId) async {
+    final query = selectOnly(cardProgress).join([
+      innerJoin(words, words.id.equalsExp(cardProgress.cardId)),
+    ])
+      ..addColumns([cardProgress.cardId])
+      ..where(cardProgress.userId.equals(userId) &
+          cardProgress.cardKind.equalsValue(CardKind.word) &
+          cardProgress.reps.isBiggerThan(cardProgress.lapses) &
+          words.topicId.equals(topicId));
+    final rows = await query.get();
+    return rows.map((r) => r.read(cardProgress.cardId)!).toSet();
+  }
+
   /// Прогресс конкретной карточки, либо `null`, если ещё не изучалась.
   Future<CardProgressRow?> getProgress(
     String userId,

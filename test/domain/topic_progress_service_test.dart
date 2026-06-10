@@ -47,6 +47,10 @@ class _FakeProgress implements ProgressRepository {
       learned[topicId] ?? 0;
 
   @override
+  Future<Set<int>> getLearnedWordIds(String userId, int topicId) =>
+      throw UnimplementedError();
+
+  @override
   Future<UserStats> getStats(String userId) async => UserStats.empty;
 
   @override

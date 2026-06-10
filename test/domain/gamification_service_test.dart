@@ -143,4 +143,71 @@ void main() {
       expect(s.todayXp, 50);
     });
   });
+
+  group('GamificationService.markActivity (повтор без XP)', () {
+    test('первая активность: streak = 1, XP не меняется', () async {
+      final repo = _FakeProgress(UserStats.empty);
+      final service = GamificationService(repo);
+      final now = DateTime(2026, 1, 10);
+
+      final s = await service.markActivity('local', now: now);
+
+      expect(s.xp, 0);
+      expect(s.streakCurrent, 1);
+      expect(s.streakBest, 1);
+      expect(s.lastActiveDay, _key(now));
+    });
+
+    test('повтор на следующий день продлевает серию без XP', () async {
+      final now = DateTime(2026, 1, 10);
+      final repo = _FakeProgress(UserStats(
+        xp: 300,
+        streakCurrent: 4,
+        streakBest: 4,
+        lastActiveDay: _key(now.subtract(const Duration(days: 1))),
+      ));
+      final service = GamificationService(repo);
+
+      final s = await service.markActivity('local', now: now);
+
+      expect(s.xp, 300);
+      expect(s.streakCurrent, 5);
+      expect(s.streakBest, 5);
+    });
+
+    test('тот же день: ничего не меняется (идемпотентно)', () async {
+      final now = DateTime(2026, 1, 10);
+      final initial = UserStats(
+        xp: 300,
+        streakCurrent: 4,
+        streakBest: 6,
+        lastActiveDay: _key(now),
+        todayXp: 100,
+        todayDate: _key(now),
+      );
+      final repo = _FakeProgress(initial);
+      final service = GamificationService(repo);
+
+      final s = await service.markActivity('local', now: now);
+
+      expect(s, initial);
+    });
+
+    test('после пропуска дня: серия начинается заново с 1', () async {
+      final now = DateTime(2026, 1, 10);
+      final repo = _FakeProgress(UserStats(
+        xp: 300,
+        streakCurrent: 4,
+        streakBest: 6,
+        lastActiveDay: _key(now.subtract(const Duration(days: 3))),
+      ));
+      final service = GamificationService(repo);
+
+      final s = await service.markActivity('local', now: now);
+
+      expect(s.streakCurrent, 1);
+      expect(s.streakBest, 6);
+      expect(s.xp, 300);
+    });
+  });
 }

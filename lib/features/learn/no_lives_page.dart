@@ -93,8 +93,10 @@ class NoLivesPage extends StatelessWidget {
                   PrimaryButton(
                     label: 'Повторить пройденное',
                     iconName: AppIcons.refresh,
-                    onPressed: () =>
-                        Get.offNamed<void>(Routes.learn, arguments: args),
+                    onPressed: () => Get.offNamed<void>(
+                      args.isPhrase ? Routes.phraseLearn : Routes.learn,
+                      arguments: args,
+                    ),
                   ),
                   const SizedBox(height: AppDimens.spaceMd),
                   GestureDetector(

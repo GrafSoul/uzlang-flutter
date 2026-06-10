@@ -6,7 +6,9 @@ import '../../app/routes/app_routes.dart';
 import '../../core/services/audio_service.dart';
 import '../../core/services/user_service.dart';
 import '../../domain/entities/phrase.dart';
+import '../../domain/entities/enums.dart';
 import '../../domain/repositories/content_repository.dart';
+import '../../domain/repositories/progress_repository.dart';
 import '../../domain/services/gamification_service.dart';
 import '../../domain/services/learning_service.dart';
 import '../../domain/services/lesson_service.dart';
@@ -38,12 +40,19 @@ class PhraseQuestion {
 /// перевод из слов-чипов. Прохождение завершает блок фраз.
 class PhraseTestController extends GetxController {
   /// Создаёт контроллер.
-  PhraseTestController(this._content, this._user, this._audio, this._lesson);
+  PhraseTestController(
+    this._content,
+    this._user,
+    this._audio,
+    this._lesson,
+    this._progress,
+  );
 
   final ContentRepository _content;
   final UserService _user;
   final AudioService _audio;
   final LessonService _lesson;
+  final ProgressRepository _progress;
 
   static const int _maxQuestions = 10;
   static const int _maxLives = 3;
@@ -185,7 +194,15 @@ class PhraseTestController extends GetxController {
 
     final total = await _content.getPhrases(args.topic.id);
     final totalBlocks = const LearningService().blockCount(total.length);
-    final unlockedNext = args.blockIndex + 1 < totalBlocks;
+    // «Открыт Блок N+1» — только если следующий блок существует и не был
+    // пройден раньше (перепрохождение старого блока ничего не открывает).
+    final completed = await _progress.getCompletedBlockIndices(
+      _user.localUserId,
+      args.topic.id,
+      CardKind.phrase,
+    );
+    final next = args.blockIndex + 1;
+    final unlockedNext = next < totalBlocks && !completed.contains(next);
 
     await Get.offNamed<void>(
       Routes.result,

@@ -44,6 +44,31 @@ class GamificationService {
     return updated;
   }
 
+  /// Засчитывает учебную активность дня без начисления XP (например,
+  /// завершённую сессию повтора): продлевает/начинает серию, чтобы streak
+  /// не сгорал у того, кто занимается только повторами.
+  Future<UserStats> markActivity(String userId, {DateTime? now}) async {
+    final today = now ?? DateTime.now();
+    final todayKey = _dayKey(today);
+    final yesterdayKey = _dayKey(today.subtract(const Duration(days: 1)));
+
+    final s = await _progress.getStats(userId);
+    if (s.lastActiveDay == todayKey && s.streakCurrent > 0) return s;
+
+    final streak = s.lastActiveDay == yesterdayKey ? s.streakCurrent + 1 : 1;
+
+    final updated = UserStats(
+      xp: s.xp,
+      streakCurrent: streak,
+      streakBest: max(s.streakBest, streak),
+      lastActiveDay: todayKey,
+      todayXp: s.todayDate == todayKey ? s.todayXp : 0,
+      todayDate: todayKey,
+    );
+    await _progress.saveStats(userId, updated);
+    return updated;
+  }
+
   /// Целевой XP на день из дневной цели в минутах (≈10 XP за минуту).
   static int dailyGoalXp(int dailyGoalMinutes) => dailyGoalMinutes * 10;
 

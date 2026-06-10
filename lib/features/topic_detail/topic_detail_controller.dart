@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../app/routes/app_routes.dart';
 import '../../core/services/user_service.dart';
 import '../../domain/entities/enums.dart';
 import '../../domain/entities/topic.dart';
@@ -87,11 +88,13 @@ class TopicDetailController extends GetxController {
   /// Переключает вкладку.
   void setTab(int index) => activeTab.value = index;
 
-  /// Сколько слов выучено внутри блока [block].
-  int learnedInBlock(WordBlock block) {
-    final before = block.index * LearningService.blockSize;
-    return (learnedWords.value - before).clamp(0, block.words.length);
-  }
+  /// Идентификаторы выученных слов темы (точный прогресс по блокам).
+  final RxSet<int> learnedIds = <int>{}.obs;
+
+  /// Сколько слов выучено внутри блока [block] — по реальным карточкам,
+  /// а не вычитанием из общего счётчика (слова учатся не строго по порядку).
+  int learnedInBlock(WordBlock block) =>
+      block.words.where((w) => learnedIds.contains(w.id)).length;
 
   @override
   void onInit() {
@@ -110,8 +113,11 @@ class TopicDetailController extends GetxController {
 
       final words = await _content.getWords(topic.id);
       totalWords.value = words.length;
-      learnedWords.value =
-          await _progress.getLearnedWordCount(userId, topic.id);
+      final ids = await _progress.getLearnedWordIds(userId, topic.id);
+      learnedIds
+        ..clear()
+        ..addAll(ids);
+      learnedWords.value = ids.length;
 
       final completed = await _progress.getCompletedBlockIndices(
         userId,
@@ -145,7 +151,11 @@ class TopicDetailController extends GetxController {
   Future<void> startBlock(String route, int blockIndex) async {
     await Get.toNamed<void>(
       route,
-      arguments: LessonArgs(topic: topic, blockIndex: blockIndex),
+      arguments: LessonArgs(
+        topic: topic,
+        blockIndex: blockIndex,
+        isPhrase: route == Routes.phraseLearn,
+      ),
     );
     await load(silent: true);
   }

@@ -5,8 +5,10 @@ import 'package:get/get.dart';
 import '../../app/routes/app_routes.dart';
 import '../../core/services/audio_service.dart';
 import '../../core/services/user_service.dart';
+import '../../domain/entities/enums.dart';
 import '../../domain/entities/word.dart';
 import '../../domain/repositories/content_repository.dart';
+import '../../domain/repositories/progress_repository.dart';
 import '../../domain/services/gamification_service.dart';
 import '../../domain/services/learning_service.dart';
 import '../../domain/services/lesson_service.dart';
@@ -38,12 +40,19 @@ class TestQuestion {
 /// неверный — минус жизнь. Прохождение завершает блок (XP + разблокировка).
 class TestController extends GetxController {
   /// Создаёт контроллер.
-  TestController(this._content, this._user, this._audio, this._lesson);
+  TestController(
+    this._content,
+    this._user,
+    this._audio,
+    this._lesson,
+    this._progress,
+  );
 
   final ContentRepository _content;
   final UserService _user;
   final AudioService _audio;
   final LessonService _lesson;
+  final ProgressRepository _progress;
 
   static const int _maxQuestions = 10;
   static const int _maxLives = 3;
@@ -153,7 +162,15 @@ class TestController extends GetxController {
 
     final all = await _content.getWordCount(args.topic.id);
     final totalBlocks = const LearningService().blockCount(all);
-    final unlockedNext = args.blockIndex + 1 < totalBlocks;
+    // «Открыт Блок N+1» — только если следующий блок существует и не был
+    // пройден раньше (перепрохождение старого блока ничего не открывает).
+    final completed = await _progress.getCompletedBlockIndices(
+      _user.localUserId,
+      args.topic.id,
+      CardKind.word,
+    );
+    final next = args.blockIndex + 1;
+    final unlockedNext = next < totalBlocks && !completed.contains(next);
 
     await Get.offNamed<void>(
       Routes.result,

@@ -7,6 +7,7 @@ import '../../domain/entities/enums.dart';
 import '../../domain/entities/word.dart';
 import '../../domain/repositories/content_repository.dart';
 import '../../domain/repositories/progress_repository.dart';
+import '../../domain/services/gamification_service.dart';
 import '../../domain/services/sr_scheduler.dart';
 
 /// Контроллер экрана «Слова — Повтор» (интервальное повторение due-карточек).
@@ -21,6 +22,7 @@ class ReviewController extends GetxController {
     this._scheduler,
     this._user,
     this._audio,
+    this._gamification,
   );
 
   final ContentRepository _content;
@@ -28,6 +30,7 @@ class ReviewController extends GetxController {
   final SrScheduler _scheduler;
   final UserService _user;
   final AudioService _audio;
+  final GamificationService _gamification;
 
   /// Due-карточки.
   final RxList<CardProgress> due = <CardProgress>[].obs;
@@ -84,12 +87,16 @@ class ReviewController extends GetxController {
   }
 
   /// Применяет оценку и переходит к следующей карточке.
+  ///
+  /// После последней карточки засчитывает сессию повтора как активность дня
+  /// (серия не сгорает у того, кто только повторяет) и закрывает экран.
   Future<void> rate(Rating rating) async {
     final updated = _scheduler.review(currentProgress, rating);
     await _progress.saveProgress(_user.localUserId, updated);
     if (index.value < due.length - 1) {
       index.value++;
     } else {
+      await _gamification.markActivity(_user.localUserId);
       Get.back<void>();
     }
   }

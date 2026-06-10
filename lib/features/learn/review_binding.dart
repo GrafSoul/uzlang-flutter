@@ -4,6 +4,7 @@ import '../../core/services/audio_service.dart';
 import '../../core/services/user_service.dart';
 import '../../domain/repositories/content_repository.dart';
 import '../../domain/repositories/progress_repository.dart';
+import '../../domain/services/gamification_service.dart';
 import '../../domain/services/sr_scheduler.dart';
 import 'review_controller.dart';
 
@@ -18,6 +19,7 @@ class ReviewBinding extends Bindings {
         Get.find<SrScheduler>(),
         Get.find<UserService>(),
         Get.find<AudioService>(),
+        Get.find<GamificationService>(),
       ),
     );
   }

@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../core/services/audio_service.dart';
 import '../../core/services/user_service.dart';
 import '../../domain/repositories/content_repository.dart';
+import '../../domain/repositories/progress_repository.dart';
 import '../../domain/services/lesson_service.dart';
 import 'test_controller.dart';
 
@@ -16,6 +17,7 @@ class TestBinding extends Bindings {
         Get.find<UserService>(),
         Get.find<AudioService>(),
         Get.find<LessonService>(),
+        Get.find<ProgressRepository>(),
       ),
     );
   }
