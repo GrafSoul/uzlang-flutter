@@ -69,17 +69,20 @@ class ProfileController extends GetxController {
   /// Загружает профиль и настройки.
   Future<void> load() async {
     isLoading.value = true;
-    name.value = _user.name;
-    joinedLabel.value = _user.joinedLabel;
-    stats.value = await _progress.getStats(_user.localUserId);
-    learnedWords.value =
-        await _progress.getTotalLearnedWords(_user.localUserId);
-    scriptMode.value = _settings.scriptMode;
-    dailyGoal.value = _settings.dailyGoalMinutes;
-    soundEnabled.value = _settings.soundEnabled;
-    remindersEnabled.value = _settings.remindersEnabled;
-    themeMode.value = _settings.themeMode;
-    isLoading.value = false;
+    try {
+      name.value = _user.name;
+      joinedLabel.value = _user.joinedLabel;
+      stats.value = await _progress.getStats(_user.localUserId);
+      learnedWords.value =
+          await _progress.getTotalLearnedWords(_user.localUserId);
+      scriptMode.value = _settings.scriptMode;
+      dailyGoal.value = _settings.dailyGoalMinutes;
+      soundEnabled.value = _settings.soundEnabled;
+      remindersEnabled.value = _settings.remindersEnabled;
+      themeMode.value = _settings.themeMode;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   /// Сохраняет имя.

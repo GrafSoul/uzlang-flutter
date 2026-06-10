@@ -85,24 +85,31 @@ class TestController extends GetxController {
   /// Загружает слова блока и строит вопросы.
   Future<void> load() async {
     isLoading.value = true;
-    final all = await _content.getWords(args.topic.id);
-    final start = args.blockIndex * LearningService.blockSize;
-    final end = (start + LearningService.blockSize).clamp(0, all.length);
-    final blockWords = start < all.length ? all.sublist(start, end) : <Word>[];
+    try {
+      final all = await _content.getWords(args.topic.id);
+      final start = args.blockIndex * LearningService.blockSize;
+      final end = (start + LearningService.blockSize).clamp(0, all.length);
+      final blockWords =
+          start < all.length ? all.sublist(start, end) : <Word>[];
 
-    final rnd = Random();
-    final pool = blockWords.map((w) => w.ru).toList();
-    final count = min(_maxQuestions, blockWords.length);
-    final chosen = [...blockWords]..shuffle(rnd);
+      final rnd = Random();
+      // Уникальные переводы: дубль ru в блоке дал бы два одинаковых варианта,
+      // один из которых считался бы «неверным».
+      final pool = blockWords.map((w) => w.ru).toSet().toList();
+      final count = min(_maxQuestions, blockWords.length);
+      final chosen = [...blockWords]..shuffle(rnd);
 
-    for (final w in chosen.take(count)) {
-      final distractors = (pool.where((r) => r != w.ru).toList()..shuffle(rnd))
-          .take(3)
-          .toList();
-      final options = [w.ru, ...distractors]..shuffle(rnd);
-      questions.add(TestQuestion(word: w, options: options, correct: w.ru));
+      for (final w in chosen.take(count)) {
+        final distractors = (pool.where((r) => r != w.ru).toList()
+              ..shuffle(rnd))
+            .take(3)
+            .toList();
+        final options = [w.ru, ...distractors]..shuffle(rnd);
+        questions.add(TestQuestion(word: w, options: options, correct: w.ru));
+      }
+    } finally {
+      isLoading.value = false;
     }
-    isLoading.value = false;
   }
 
   /// Озвучивает текущее слово.
@@ -145,7 +152,7 @@ class TestController extends GetxController {
     );
 
     final all = await _content.getWordCount(args.topic.id);
-    final totalBlocks = LearningService().blockCount(all);
+    final totalBlocks = const LearningService().blockCount(all);
     final unlockedNext = args.blockIndex + 1 < totalBlocks;
 
     await Get.offNamed<void>(

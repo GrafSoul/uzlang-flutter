@@ -98,32 +98,35 @@ class PhraseTestController extends GetxController {
   /// Загружает фразы блока и строит вопросы.
   Future<void> load() async {
     isLoading.value = true;
-    final all = await _content.getPhrases(args.topic.id);
-    final start = args.blockIndex * LearningService.blockSize;
-    final end = (start + LearningService.blockSize).clamp(0, all.length);
-    final block = start < all.length ? all.sublist(start, end) : <Phrase>[];
+    try {
+      final all = await _content.getPhrases(args.topic.id);
+      final start = args.blockIndex * LearningService.blockSize;
+      final end = (start + LearningService.blockSize).clamp(0, all.length);
+      final block = start < all.length ? all.sublist(start, end) : <Phrase>[];
 
-    final rnd = Random();
-    // Пул слов-дистракторов из всех фраз блока.
-    final pool = <String>{
-      for (final p in block) ...p.uz.split(RegExp(r'\s+')),
-    }.toList();
+      final rnd = Random();
+      // Пул слов-дистракторов из всех фраз блока.
+      final pool = <String>{
+        for (final p in block) ...p.uz.trim().split(RegExp(r'\s+')),
+      }.toList();
 
-    final chosen = [...block]..shuffle(rnd);
-    for (final p in chosen.take(min(_maxQuestions, block.length))) {
-      final tokens = p.uz.split(RegExp(r'\s+'));
-      final distractors = (pool.where((t) => !tokens.contains(t)).toList()
-            ..shuffle(rnd))
-          .take(3)
-          .toList();
-      final bank = [...tokens, ...distractors]..shuffle(rnd);
-      questions.add(PhraseQuestion(
-        phrase: p,
-        correctTokens: tokens,
-        bank: bank,
-      ));
+      final chosen = [...block]..shuffle(rnd);
+      for (final p in chosen.take(min(_maxQuestions, block.length))) {
+        final tokens = p.uz.trim().split(RegExp(r'\s+'));
+        final distractors = (pool.where((t) => !tokens.contains(t)).toList()
+              ..shuffle(rnd))
+            .take(3)
+            .toList();
+        final bank = [...tokens, ...distractors]..shuffle(rnd);
+        questions.add(PhraseQuestion(
+          phrase: p,
+          correctTokens: tokens,
+          bank: bank,
+        ));
+      }
+    } finally {
+      isLoading.value = false;
     }
-    isLoading.value = false;
   }
 
   /// Озвучивает текущую фразу.
@@ -145,7 +148,9 @@ class PhraseTestController extends GetxController {
   void check() {
     if (!canCheck) return;
     revealed.value = true;
-    isCorrect.value = assembled == question.phrase.uz;
+    // Сравнение по токенам: устойчиво к лишним пробелам в контенте,
+    // из которых собрать «байт-в-байт» строку фразы невозможно.
+    isCorrect.value = assembled == question.correctTokens.join(' ');
     if (isCorrect.value) {
       correct.value++;
     } else {
@@ -179,7 +184,7 @@ class PhraseTestController extends GetxController {
     );
 
     final total = await _content.getPhrases(args.topic.id);
-    final totalBlocks = LearningService().blockCount(total.length);
+    final totalBlocks = const LearningService().blockCount(total.length);
     final unlockedNext = args.blockIndex + 1 < totalBlocks;
 
     await Get.offNamed<void>(

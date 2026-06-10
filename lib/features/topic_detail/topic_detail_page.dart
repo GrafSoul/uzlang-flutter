@@ -4,7 +4,6 @@ import 'package:get/get.dart';
 import '../../app/routes/app_routes.dart';
 import '../../core/theme/theme.dart';
 import '../../domain/entities/word_block.dart';
-import '../learn/lesson_args.dart';
 import '../shared/widgets/widgets.dart';
 import 'topic_detail_controller.dart';
 
@@ -615,18 +614,12 @@ class _CircleBack extends StatelessWidget {
   }
 }
 
-/// Запускает блок слов.
+/// Запускает блок слов (с тихим рефрешем обзора по возвращении).
 void _startWordBlock(TopicDetailController controller, int blockIndex) {
-  Get.toNamed<void>(
-    Routes.learn,
-    arguments: LessonArgs(topic: controller.topic, blockIndex: blockIndex),
-  );
+  controller.startBlock(Routes.learn, blockIndex);
 }
 
-/// Запускает блок фраз.
+/// Запускает блок фраз (с тихим рефрешем обзора по возвращении).
 void _startPhraseBlock(TopicDetailController controller, int blockIndex) {
-  Get.toNamed<void>(
-    Routes.phraseLearn,
-    arguments: LessonArgs(topic: controller.topic, blockIndex: blockIndex),
-  );
+  controller.startBlock(Routes.phraseLearn, blockIndex);
 }

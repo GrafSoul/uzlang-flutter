@@ -58,11 +58,14 @@ class LearnController extends GetxController {
   /// Загружает слова блока.
   Future<void> load() async {
     isLoading.value = true;
-    final all = await _content.getWords(args.topic.id);
-    final start = args.blockIndex * LearningService.blockSize;
-    final end = (start + LearningService.blockSize).clamp(0, all.length);
-    words.value = start < all.length ? all.sublist(start, end) : [];
-    isLoading.value = false;
+    try {
+      final all = await _content.getWords(args.topic.id);
+      final start = args.blockIndex * LearningService.blockSize;
+      final end = (start + LearningService.blockSize).clamp(0, all.length);
+      words.value = start < all.length ? all.sublist(start, end) : [];
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   /// Озвучивает текущее слово.

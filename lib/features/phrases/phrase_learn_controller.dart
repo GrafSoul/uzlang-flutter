@@ -57,11 +57,14 @@ class PhraseLearnController extends GetxController {
   /// Загружает фразы блока.
   Future<void> load() async {
     isLoading.value = true;
-    final all = await _content.getPhrases(args.topic.id);
-    final start = args.blockIndex * LearningService.blockSize;
-    final end = (start + LearningService.blockSize).clamp(0, all.length);
-    phrases.value = start < all.length ? all.sublist(start, end) : [];
-    isLoading.value = false;
+    try {
+      final all = await _content.getPhrases(args.topic.id);
+      final start = args.blockIndex * LearningService.blockSize;
+      final end = (start + LearningService.blockSize).clamp(0, all.length);
+      phrases.value = start < all.length ? all.sublist(start, end) : [];
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   /// Озвучивает текущую фразу.

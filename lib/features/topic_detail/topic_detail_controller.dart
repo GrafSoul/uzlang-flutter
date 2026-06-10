@@ -7,6 +7,7 @@ import '../../domain/entities/word_block.dart';
 import '../../domain/repositories/content_repository.dart';
 import '../../domain/repositories/progress_repository.dart';
 import '../../domain/services/learning_service.dart';
+import '../learn/lesson_args.dart';
 
 /// Контроллер экрана «Тема — обзор».
 ///
@@ -100,36 +101,52 @@ class TopicDetailController extends GetxController {
   }
 
   /// Загружает данные обзора темы.
-  Future<void> load() async {
-    isLoading.value = true;
-    final userId = _user.localUserId;
+  ///
+  /// [silent] — обновить значения без спиннера (рефреш после урока).
+  Future<void> load({bool silent = false}) async {
+    if (!silent) isLoading.value = true;
+    try {
+      final userId = _user.localUserId;
 
-    final words = await _content.getWords(topic.id);
-    totalWords.value = words.length;
-    learnedWords.value = await _progress.getLearnedWordCount(userId, topic.id);
+      final words = await _content.getWords(topic.id);
+      totalWords.value = words.length;
+      learnedWords.value =
+          await _progress.getLearnedWordCount(userId, topic.id);
 
-    final completed = await _progress.getCompletedBlockIndices(
-      userId,
-      topic.id,
-      CardKind.word,
+      final completed = await _progress.getCompletedBlockIndices(
+        userId,
+        topic.id,
+        CardKind.word,
+      );
+      blocks.value = _learning.buildWordBlocks(topic.id, words, completed);
+      phrasesUnlocked.value = _learning.arePhrasesUnlocked(
+        learnedWords: learnedWords.value,
+        totalWords: words.length,
+      );
+
+      final phrases = await _content.getPhrases(topic.id);
+      totalPhrases.value = phrases.length;
+      final phraseCompleted = await _progress.getCompletedBlockIndices(
+        userId,
+        topic.id,
+        CardKind.phrase,
+      );
+      phraseBlocks.value =
+          _learning.buildBlocks(phrases.length, phraseCompleted);
+
+      streak.value = (await _progress.getStats(userId)).streakCurrent;
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Запускает урок по маршруту [route] для блока [blockIndex] и тихо
+  /// обновляет обзор по возвращении (выход крестиком тоже меняет прогресс).
+  Future<void> startBlock(String route, int blockIndex) async {
+    await Get.toNamed<void>(
+      route,
+      arguments: LessonArgs(topic: topic, blockIndex: blockIndex),
     );
-    blocks.value = _learning.buildWordBlocks(topic.id, words, completed);
-    phrasesUnlocked.value = _learning.arePhrasesUnlocked(
-      learnedWords: learnedWords.value,
-      totalWords: words.length,
-    );
-
-    final phrases = await _content.getPhrases(topic.id);
-    totalPhrases.value = phrases.length;
-    final phraseCompleted = await _progress.getCompletedBlockIndices(
-      userId,
-      topic.id,
-      CardKind.phrase,
-    );
-    phraseBlocks.value = _learning.buildBlocks(phrases.length, phraseCompleted);
-
-    streak.value = (await _progress.getStats(userId)).streakCurrent;
-
-    isLoading.value = false;
+    await load(silent: true);
   }
 }

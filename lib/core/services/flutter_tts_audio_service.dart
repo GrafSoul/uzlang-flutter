@@ -11,11 +11,15 @@ import 'settings_service.dart';
 class FlutterTtsAudioService implements AudioService {
   /// Создаёт сервис поверх [_settings] (флаг звука) и [FlutterTts].
   FlutterTtsAudioService(this._settings) {
-    _configure();
+    _ready = _configure();
   }
 
   final SettingsService _settings;
   final FlutterTts _tts = FlutterTts();
+
+  /// Завершение настройки движка — [playWord] ждёт его, чтобы первый вызов
+  /// не ушёл до установки языка/темпа.
+  late final Future<void> _ready;
 
   /// Язык озвучки — узбекский (как `utterance.lang = 'uz-UZ'` в React).
   static const String _lang = 'uz-UZ';
@@ -26,11 +30,16 @@ class FlutterTtsAudioService implements AudioService {
   static const double _rate = 0.46;
 
   Future<void> _configure() async {
-    await _tts.awaitSpeakCompletion(true);
-    await _tts.setSpeechRate(_rate);
-    final available = await _isLanguageAvailable();
-    if (available) {
-      await _tts.setLanguage(_lang);
+    try {
+      await _tts.awaitSpeakCompletion(true);
+      await _tts.setSpeechRate(_rate);
+      final available = await _isLanguageAvailable();
+      if (available) {
+        await _tts.setLanguage(_lang);
+      }
+    } catch (_) {
+      // Движок TTS недоступен (нет на устройстве) — озвучка молча выключена,
+      // приложение работает дальше.
     }
   }
 
@@ -48,10 +57,22 @@ class FlutterTtsAudioService implements AudioService {
     if (!_settings.soundEnabled) return;
     final text = latinText.trim();
     if (text.isEmpty) return;
-    await _tts.stop();
-    await _tts.speak(text);
+    await _ready;
+    try {
+      await _tts.stop();
+      await _tts.speak(text);
+    } catch (_) {
+      // Сбой синтеза не должен ронять урок — озвучка опциональна.
+    }
   }
 
   @override
-  Future<void> stop() => _tts.stop();
+  Future<void> stop() async {
+    await _ready;
+    try {
+      await _tts.stop();
+    } catch (_) {
+      // Игнорируем: остановка несозданного движка не критична.
+    }
+  }
 }

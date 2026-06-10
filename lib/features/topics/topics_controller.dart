@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 
+import '../../app/routes/app_routes.dart';
 import '../../core/services/user_service.dart';
 import '../../domain/entities/topic_progress.dart';
 import '../../domain/services/topic_progress_service.dart';
@@ -43,10 +44,21 @@ class TopicsController extends GetxController {
   }
 
   /// Загружает темы.
-  Future<void> load() async {
-    isLoading.value = true;
-    all.value = await _topicProgress.buildAll(_user.localUserId);
-    isLoading.value = false;
+  ///
+  /// [silent] — обновить список без спиннера (рефреш при возврате назад).
+  Future<void> load({bool silent = false}) async {
+    if (!silent) isLoading.value = true;
+    try {
+      all.value = await _topicProgress.buildAll(_user.localUserId);
+    } finally {
+      isLoading.value = false;
+    }
+  }
+
+  /// Открывает обзор темы и тихо обновляет список по возвращении.
+  Future<void> openTopic(TopicProgress tp) async {
+    await Get.toNamed<void>(Routes.topicDetail, arguments: tp.topic);
+    await load(silent: true);
   }
 
   /// Подпись для закрытой темы [topic] (первой нужно завершить предыдущую).

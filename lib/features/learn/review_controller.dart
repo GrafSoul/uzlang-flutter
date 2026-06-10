@@ -59,19 +59,22 @@ class ReviewController extends GetxController {
   /// Загружает карточки к повтору.
   Future<void> load() async {
     isLoading.value = true;
-    final userId = _user.localUserId;
-    final cards = await _progress.getDueCards(
-      userId,
-      CardKind.word,
-      DateTime.now(),
-    );
-    final ids = cards.map((c) => c.cardId).toList();
-    final words = await _content.getWordsByIds(ids);
-    _wordsById
-      ..clear()
-      ..addEntries(words.map((w) => MapEntry(w.id, w)));
-    due.value = cards.where((c) => _wordsById.containsKey(c.cardId)).toList();
-    isLoading.value = false;
+    try {
+      final userId = _user.localUserId;
+      final cards = await _progress.getDueCards(
+        userId,
+        CardKind.word,
+        DateTime.now(),
+      );
+      final ids = cards.map((c) => c.cardId).toList();
+      final words = await _content.getWordsByIds(ids);
+      _wordsById
+        ..clear()
+        ..addEntries(words.map((w) => MapEntry(w.id, w)));
+      due.value = cards.where((c) => _wordsById.containsKey(c.cardId)).toList();
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   /// Озвучивает текущее слово.

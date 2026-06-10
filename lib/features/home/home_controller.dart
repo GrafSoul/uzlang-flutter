@@ -63,35 +63,49 @@ class HomeController extends GetxController {
   }
 
   /// Загружает данные Главной.
-  Future<void> load() async {
-    isLoading.value = true;
-    final userId = _user.localUserId;
+  ///
+  /// [silent] — обновить значения без спиннера (рефреш при возврате назад,
+  /// чтобы экран не мигал).
+  Future<void> load({bool silent = false}) async {
+    if (!silent) isLoading.value = true;
+    try {
+      final userId = _user.localUserId;
 
-    userName.value = _user.name;
-    dailyGoalMinutes.value = _settings.dailyGoalMinutes;
-    final s = await _progress.getStats(userId);
-    stats.value = s;
-    final today = _todayKey();
-    todayMinutes.value =
-        s.todayDate == today ? GamificationService.minutesFromXp(s.todayXp) : 0;
-    topics.value = await _topicProgress.buildAll(userId);
-    dueCount.value =
-        (await _progress.getDueCards(userId, CardKind.word, DateTime.now()))
-            .length;
-    isLoading.value = false;
+      userName.value = _user.name;
+      dailyGoalMinutes.value = _settings.dailyGoalMinutes;
+      final s = await _progress.getStats(userId);
+      stats.value = s;
+      final today = _todayKey();
+      todayMinutes.value = s.todayDate == today
+          ? GamificationService.minutesFromXp(s.todayXp)
+          : 0;
+      topics.value = await _topicProgress.buildAll(userId);
+      dueCount.value =
+          (await _progress.getDueCards(userId, CardKind.word, DateTime.now()))
+              .length;
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   /// Действие карточки «Продолжить»: если есть карточки к повтору — повтор,
-  /// иначе переход к текущей теме.
-  void openContinue() {
+  /// иначе переход к текущей теме. По возвращении тихо обновляет Главную
+  /// (XP/серия/проценты могли измениться).
+  Future<void> openContinue() async {
     if (dueCount.value > 0) {
-      Get.toNamed<void>(Routes.review);
-      return;
+      await Get.toNamed<void>(Routes.review);
+    } else {
+      final tp = continueTopic;
+      if (tp == null) return;
+      await Get.toNamed<void>(Routes.topicDetail, arguments: tp.topic);
     }
-    final tp = continueTopic;
-    if (tp != null) {
-      Get.toNamed<void>(Routes.topicDetail, arguments: tp.topic);
-    }
+    await load(silent: true);
+  }
+
+  /// Открывает маршрут [route] и тихо обновляет Главную по возвращении.
+  Future<void> openAndRefresh(String route, {dynamic arguments}) async {
+    await Get.toNamed<void>(route, arguments: arguments);
+    await load(silent: true);
   }
 
   String _todayKey() {

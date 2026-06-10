@@ -263,7 +263,7 @@ class _TopicsHeader extends StatelessWidget {
       children: [
         Text('Темы', style: AppTextStyles.title),
         GestureDetector(
-          onTap: () => Get.toNamed<void>(Routes.topics),
+          onTap: () => Get.find<HomeController>().openAndRefresh(Routes.topics),
           child: Text(
             'Все $count',
             style: AppTextStyles.label.copyWith(color: AppColors.textSecondary),
@@ -388,7 +388,8 @@ class _RoundIconButton extends StatelessWidget {
   }
 }
 
-/// Открывает обзор темы.
+/// Открывает обзор темы; по возвращении тихо обновляет Главную.
 void _openTopic(TopicProgress tp) {
-  Get.toNamed<void>(Routes.topicDetail, arguments: tp.topic);
+  Get.find<HomeController>()
+      .openAndRefresh(Routes.topicDetail, arguments: tp.topic);
 }

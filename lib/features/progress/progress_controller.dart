@@ -102,13 +102,16 @@ class ProgressController extends GetxController {
   /// Загружает данные прогресса.
   Future<void> load() async {
     isLoading.value = true;
-    final userId = _user.localUserId;
-    final s = await _progress.getStats(userId);
-    stats.value = s;
-    learnedWords.value = await _progress.getTotalLearnedWords(userId);
-    accuracy.value = await _progress.getAverageAccuracy(userId);
-    achievements.value = _achievements.evaluate(s);
-    isLoading.value = false;
+    try {
+      final userId = _user.localUserId;
+      final s = await _progress.getStats(userId);
+      stats.value = s;
+      learnedWords.value = await _progress.getTotalLearnedWords(userId);
+      accuracy.value = await _progress.getAverageAccuracy(userId);
+      achievements.value = _achievements.evaluate(s);
+    } finally {
+      isLoading.value = false;
+    }
   }
 
   String _todayKey() {

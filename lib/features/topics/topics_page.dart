@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import '../../app/routes/app_routes.dart';
 import '../../core/theme/theme.dart';
-import '../../domain/entities/topic.dart';
 import '../../domain/entities/topic_progress.dart';
 import '../shared/widgets/widgets.dart';
 import 'topics_controller.dart';
@@ -120,7 +118,9 @@ class _Tile extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppDimens.spaceMd),
       child: AppCard(
-        onTap: locked ? null : () => _open(progress.topic),
+        onTap: locked
+            ? null
+            : () => Get.find<TopicsController>().openTopic(progress),
         radius: AppDimens.radiusMd,
         color: AppColors.surfaceRaised,
         child: Row(
@@ -260,8 +260,4 @@ class _CircleBack extends StatelessWidget {
       ),
     );
   }
-}
-
-void _open(Topic topic) {
-  Get.toNamed<void>(Routes.topicDetail, arguments: topic);
 }
