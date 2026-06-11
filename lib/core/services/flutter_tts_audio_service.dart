@@ -32,6 +32,10 @@ class FlutterTtsAudioService implements AudioService {
   /// Идущая/завершённая инициализация, либо `null`, если ещё не начиналась.
   Future<bool>? _init;
 
+  /// Говорим через турецкий голос (фолбэк без узбекского): текст
+  /// предварительно транслитерируется в турецкую орфографию.
+  bool _turkishFallback = false;
+
   /// Ленивая инициализация движка. `false` — движок недоступен/завис,
   /// озвучка отключается до конца сеанса (приложение работает дальше).
   Future<bool> _ensureReady() {
@@ -69,6 +73,17 @@ class FlutterTtsAudioService implements AudioService {
       if (uzLang != null) {
         await _tts.setLanguage(uzLang).timeout(_nativeTimeout);
         debugPrint('TTS: узбекский найден и установлен ($uzLang)');
+        return true;
+      }
+      // Фолбэк: турецкий — ближайшая тюркская фонетика для латиницы.
+      final trOk = await _tts
+          .isLanguageAvailable('tr-TR')
+          .timeout(_nativeTimeout, onTimeout: () => false);
+      if (trOk == true || trOk == 1) {
+        await _tts.setLanguage('tr-TR').timeout(_nativeTimeout);
+        _turkishFallback = true;
+        debugPrint('TTS: узбекского голоса НЕТ — включён турецкий фолбэк '
+            '(транслитерация в турецкую орфографию)');
       } else {
         debugPrint('TTS: узбекского голоса НЕТ — используется голос '
             'движка по умолчанию');
@@ -89,12 +104,34 @@ class FlutterTtsAudioService implements AudioService {
     if (!await _ensureReady()) return;
     try {
       await _tts.stop().timeout(_nativeTimeout);
+      final speakText = _turkishFallback ? toTurkish(text) : text;
       // Без awaitSpeakCompletion: speak ставит фразу в очередь и сразу
       // возвращается (как speechSynthesis.speak в вебе).
-      await _tts.speak(text).timeout(_nativeTimeout);
+      await _tts.speak(speakText).timeout(_nativeTimeout);
     } catch (_) {
       // Сбой синтеза не должен ронять урок — озвучка опциональна.
     }
+  }
+
+  /// Транслитерация узбекской латиницы в турецкую орфографию, чтобы
+  /// турецкий голос читал максимально близко к узбекскому произношению:
+  /// sh→ş, ch→ç, j→c (дж), x→h, q→k, gʻ→ğ, oʻ→o.
+  @visibleForTesting
+  static String toTurkish(String text) {
+    var t = text;
+    for (final (from, to) in const [
+      ("o'", 'o'), ('oʻ', 'o'), ('o‘', 'o'),
+      ("g'", 'ğ'), ('gʻ', 'ğ'), ('g‘', 'ğ'),
+      ('sh', 'ş'), ('Sh', 'Ş'), ('SH', 'Ş'),
+      ('ch', 'ç'), ('Ch', 'Ç'), ('CH', 'Ç'),
+      ('j', 'c'), ('J', 'C'),
+      ('x', 'h'), ('X', 'H'),
+      ('q', 'k'), ('Q', 'K'),
+      ("'", ''), ('ʼ', ''), ('’', ''),
+    ]) {
+      t = t.replaceAll(from, to);
+    }
+    return t;
   }
 
   @override
