@@ -87,7 +87,11 @@ class _Header extends GetView<HomeController> {
             ],
           ),
         ),
-        _RoundIconButton(icon: AppIcons.settings, onTap: () {}),
+        // Шестерёнка ведёт в «Профиль» — там живут все настройки.
+        _RoundIconButton(
+          icon: AppIcons.settings,
+          onTap: () => Get.offAllNamed<void>(Routes.profile),
+        ),
       ],
     );
   }
