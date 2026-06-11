@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 
 import 'audio_service.dart';
@@ -21,9 +22,6 @@ class FlutterTtsAudioService implements AudioService {
   final SettingsService _settings;
   final FlutterTts _tts = FlutterTts();
 
-  /// Язык озвучки — узбекский (как `utterance.lang = 'uz-UZ'` в React).
-  static const String _lang = 'uz-UZ';
-
   /// Темп речи. В Web Speech использовалось `rate = 0.92` по шкале, где 1.0 —
   /// норма. flutter_tts ожидает 0..1, где 0.5 — норма, поэтому ≈ 0.46.
   static const double _rate = 0.46;
@@ -43,15 +41,42 @@ class FlutterTtsAudioService implements AudioService {
   Future<bool> _configure() async {
     try {
       await _tts.setSpeechRate(_rate).timeout(_nativeTimeout);
-      final available = await _tts
-          .isLanguageAvailable(_lang)
-          .timeout(_nativeTimeout, onTimeout: () => false);
-      if (available == true || available == 1) {
-        await _tts.setLanguage(_lang).timeout(_nativeTimeout);
+
+      // Ищем узбекский: сперва точные локали, затем любой `uz*` из списка
+      // языков движка. Без находки остаёмся на голосе по умолчанию
+      // (латиница прозвучит неточно) — и честно пишем это в лог.
+      String? uzLang;
+      for (final candidate in const ['uz-UZ', 'uz']) {
+        final ok = await _tts
+            .isLanguageAvailable(candidate)
+            .timeout(_nativeTimeout, onTimeout: () => false);
+        if (ok == true || ok == 1) {
+          uzLang = candidate;
+          break;
+        }
+      }
+      if (uzLang == null) {
+        final langs = await _tts.getLanguages
+            .timeout(_nativeTimeout, onTimeout: () => <dynamic>[]);
+        final list = (langs as List?)?.map((e) => '$e').toList() ?? const [];
+        uzLang = list.cast<String?>().firstWhere(
+              (l) => l!.toLowerCase().startsWith('uz'),
+              orElse: () => null,
+            );
+        debugPrint('TTS: языки движка (${list.length}): '
+            '${list.where((l) => l.toLowerCase().startsWith("u")).join(", ")}');
+      }
+      if (uzLang != null) {
+        await _tts.setLanguage(uzLang).timeout(_nativeTimeout);
+        debugPrint('TTS: узбекский найден и установлен ($uzLang)');
+      } else {
+        debugPrint('TTS: узбекского голоса НЕТ — используется голос '
+            'движка по умолчанию');
       }
       return true;
-    } catch (_) {
+    } catch (e) {
       // Движок TTS отсутствует или завис — озвучка молча выключена.
+      debugPrint('TTS: инициализация не удалась: $e');
       return false;
     }
   }
