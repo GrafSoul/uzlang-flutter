@@ -2,6 +2,7 @@ import 'package:get/get.dart';
 
 import '../../app/routes/app_routes.dart';
 import '../../core/services/audio_service.dart';
+import '../../core/services/lesson_resume_store.dart';
 import '../../core/services/user_service.dart';
 import '../../domain/entities/card_progress.dart';
 import '../../domain/entities/enums.dart';
@@ -24,6 +25,7 @@ class PhraseLearnController extends GetxController {
     this._scheduler,
     this._user,
     this._audio,
+    this._resume,
   );
 
   final ContentRepository _content;
@@ -31,6 +33,7 @@ class PhraseLearnController extends GetxController {
   final SrScheduler _scheduler;
   final UserService _user;
   final AudioService _audio;
+  final LessonResumeStore _resume;
 
   /// Аргументы сессии.
   late final LessonArgs args;
@@ -62,6 +65,12 @@ class PhraseLearnController extends GetxController {
       final start = args.blockIndex * LearningService.blockSize;
       final end = (start + LearningService.blockSize).clamp(0, all.length);
       phrases.value = start < all.length ? all.sublist(start, end) : [];
+      // Продолжаем с места, где остановились в прошлый раз.
+      final saved =
+          _resume.readIndex(CardKind.phrase, args.topic.id, args.blockIndex);
+      if (saved != null && saved > 0 && saved < phrases.length) {
+        index.value = saved;
+      }
     } finally {
       isLoading.value = false;
     }
@@ -106,7 +115,15 @@ class PhraseLearnController extends GetxController {
   void _advance() {
     if (index.value < phrases.length - 1) {
       index.value++;
+      _resume.saveIndex(
+        CardKind.phrase,
+        args.topic.id,
+        args.blockIndex,
+        index.value,
+      );
     } else {
+      // Блок доучен — позиция больше не нужна.
+      _resume.clear(CardKind.phrase, args.topic.id, args.blockIndex);
       Get.offNamed<void>(Routes.phraseTest, arguments: args);
     }
   }

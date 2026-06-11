@@ -1,6 +1,7 @@
 import 'package:get/get.dart';
 
 import '../../core/services/audio_service.dart';
+import '../../core/services/lesson_resume_store.dart';
 import '../../core/services/user_service.dart';
 import '../../domain/repositories/content_repository.dart';
 import '../../domain/repositories/progress_repository.dart';
@@ -18,6 +19,7 @@ class PhraseLearnBinding extends Bindings {
         Get.find<SrScheduler>(),
         Get.find<UserService>(),
         Get.find<AudioService>(),
+        Get.find<LessonResumeStore>(),
       ),
     );
   }
