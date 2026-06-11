@@ -86,18 +86,27 @@ class ReviewController extends GetxController {
     if (w != null) await _audio.playWord(w.uz);
   }
 
+  /// Защита от двойного тапа: оценка карточки пишется ровно один раз.
+  bool _busy = false;
+
   /// Применяет оценку и переходит к следующей карточке.
   ///
   /// После последней карточки засчитывает сессию повтора как активность дня
   /// (серия не сгорает у того, кто только повторяет) и закрывает экран.
   Future<void> rate(Rating rating) async {
-    final updated = _scheduler.review(currentProgress, rating);
-    await _progress.saveProgress(_user.localUserId, updated);
-    if (index.value < due.length - 1) {
-      index.value++;
-    } else {
-      await _gamification.markActivity(_user.localUserId);
-      Get.back<void>();
+    if (_busy) return;
+    _busy = true;
+    try {
+      final updated = _scheduler.review(currentProgress, rating);
+      await _progress.saveProgress(_user.localUserId, updated);
+      if (index.value < due.length - 1) {
+        index.value++;
+      } else {
+        await _gamification.markActivity(_user.localUserId);
+        Get.back<void>();
+      }
+    } finally {
+      _busy = false;
     }
   }
 }

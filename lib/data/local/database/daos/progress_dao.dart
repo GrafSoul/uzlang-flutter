@@ -32,6 +32,23 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
     return row.read(count) ?? 0;
   }
 
+  /// Выучено слов по каждой теме одним запросом (`reps > lapses`).
+  Future<Map<int, int>> countLearnedWordsPerTopic(String userId) async {
+    final count = cardProgress.id.count();
+    final query = selectOnly(cardProgress).join([
+      innerJoin(words, words.id.equalsExp(cardProgress.cardId)),
+    ])
+      ..addColumns([words.topicId, count])
+      ..where(cardProgress.userId.equals(userId) &
+          cardProgress.cardKind.equalsValue(CardKind.word) &
+          cardProgress.reps.isBiggerThan(cardProgress.lapses))
+      ..groupBy([words.topicId]);
+    final rows = await query.get();
+    return {
+      for (final r in rows) r.read(words.topicId)!: r.read(count) ?? 0,
+    };
+  }
+
   /// Идентификаторы выученных слов темы (`reps > lapses`).
   ///
   /// Нужен для точного подсчёта выученного по блокам: вычитание из общего

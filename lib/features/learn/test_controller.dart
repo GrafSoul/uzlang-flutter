@@ -119,6 +119,8 @@ class TestController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+    // Нет вопросов (битый индекс/контент) — выходим, а не висим на спиннере.
+    if (questions.isEmpty) Get.back<void>();
   }
 
   /// Озвучивает текущее слово.
@@ -136,8 +138,22 @@ class TestController extends GetxController {
     }
   }
 
+  /// Защита от двойного тапа «Продолжить»: завершение блока пишет XP/прогресс
+  /// и должно выполниться ровно один раз.
+  bool _busy = false;
+
   /// Переход к следующему вопросу или завершение.
   Future<void> next() async {
+    if (_busy) return;
+    _busy = true;
+    try {
+      await _next();
+    } finally {
+      _busy = false;
+    }
+  }
+
+  Future<void> _next() async {
     if (lives.value <= 0) {
       await Get.offNamed<void>(Routes.noLives, arguments: args);
       return;

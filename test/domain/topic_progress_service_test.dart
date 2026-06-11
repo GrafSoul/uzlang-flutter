@@ -24,6 +24,9 @@ class _FakeContent implements ContentRepository {
   Future<int> getWordCount(int topicId) async => counts[topicId] ?? 0;
 
   @override
+  Future<Map<int, int>> getWordCountsPerTopic() async => counts;
+
+  @override
   Future<Topic?> getTopicByKey(String key) => throw UnimplementedError();
 
   @override
@@ -49,6 +52,10 @@ class _FakeProgress implements ProgressRepository {
   @override
   Future<Set<int>> getLearnedWordIds(String userId, int topicId) =>
       throw UnimplementedError();
+
+  @override
+  Future<Map<int, int>> getLearnedWordCountsPerTopic(String userId) async =>
+      learned;
 
   @override
   Future<UserStats> getStats(String userId) async => UserStats.empty;

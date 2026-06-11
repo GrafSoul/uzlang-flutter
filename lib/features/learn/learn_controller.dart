@@ -66,13 +66,29 @@ class LearnController extends GetxController {
     } finally {
       isLoading.value = false;
     }
+    // Пустой блок (битый индекс/контент) — выходим, а не висим на спиннере.
+    if (words.isEmpty) Get.back<void>();
   }
 
   /// Озвучивает текущее слово.
   Future<void> playAudio() => _audio.playWord(current.uz);
 
+  /// Защита от двойного тапа: пока пишется прогресс, повторный вызов
+  /// игнорируется (иначе двойная запись FSRS по той же карточке).
+  bool _busy = false;
+
   /// Отмечает текущее слово как «знаю»/«ещё учу» и переходит дальше.
   Future<void> mark({required bool known}) async {
+    if (_busy) return;
+    _busy = true;
+    try {
+      await _mark(known: known);
+    } finally {
+      _busy = false;
+    }
+  }
+
+  Future<void> _mark({required bool known}) async {
     final userId = _user.localUserId;
     final existing = await _progress.getProgress(
           userId,

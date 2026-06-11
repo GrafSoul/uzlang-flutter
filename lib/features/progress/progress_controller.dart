@@ -75,7 +75,7 @@ class ProgressController extends GetxController {
   /// Минуты за сегодня (для недельного графика).
   int get todayMinutes {
     final s = stats.value;
-    return s.todayDate == _todayKey()
+    return s.todayDate == GamificationService.dayKey(DateTime.now())
         ? GamificationService.minutesFromXp(s.todayXp)
         : 0;
   }
@@ -84,11 +84,16 @@ class ProgressController extends GetxController {
   List<DayCell> get weekDays {
     final today = DateTime.now().weekday; // 1..7
     final streak = stats.value.streakCurrent;
+    final activeToday =
+        stats.value.lastActiveDay == GamificationService.dayKey(DateTime.now());
     return List.generate(7, (i) {
       final dayNum = i + 1; // 1..7
       final isToday = dayNum == today;
-      // День засчитан, если он в пределах текущей серии до сегодняшнего дня.
-      final isDone = dayNum < today && (today - dayNum) < streak;
+      // День засчитан, если он в пределах текущей серии; сегодняшний —
+      // если активность уже была сегодня.
+      final isDone = isToday
+          ? activeToday
+          : dayNum < today && (today - dayNum) < streak;
       return DayCell(label: _weekLabels[i], isToday: isToday, isDone: isDone);
     });
   }
@@ -114,8 +119,4 @@ class ProgressController extends GetxController {
     }
   }
 
-  String _todayKey() {
-    final d = DateTime.now();
-    return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-  }
 }

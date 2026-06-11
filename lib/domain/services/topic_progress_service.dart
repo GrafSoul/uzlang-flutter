@@ -15,13 +15,18 @@ class TopicProgressService {
   final ProgressRepository _progress;
 
   /// Строит прогресс по всем темам по порядку для пользователя [userId].
+  ///
+  /// Три запроса суммарно (темы + счётчики слов + счётчики выученного),
+  /// а не пара запросов на каждую тему.
   Future<List<TopicProgress>> buildAll(String userId) async {
     final topics = await _content.getTopics();
+    final totals = await _content.getWordCountsPerTopic();
+    final learnedByTopic = await _progress.getLearnedWordCountsPerTopic(userId);
     final result = <TopicProgress>[];
     var prevCompleted = true; // первая тема всегда открыта
     for (final topic in topics) {
-      final total = await _content.getWordCount(topic.id);
-      final learned = await _progress.getLearnedWordCount(userId, topic.id);
+      final total = totals[topic.id] ?? 0;
+      final learned = learnedByTopic[topic.id] ?? 0;
       final isDone = total > 0 && learned >= total;
 
       final TopicStatus status;

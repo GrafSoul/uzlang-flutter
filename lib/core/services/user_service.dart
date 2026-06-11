@@ -52,7 +52,16 @@ class UserService {
   }
 
   /// Стабильный анонимный идентификатор пользователя.
-  String get localUserId => _box.read<String>(_kId)!;
+  ///
+  /// Если хранилище потеряло запись (сбой GetStorage на первом запуске),
+  /// генерирует новый id вместо краша всех контроллеров.
+  String get localUserId {
+    final id = _box.read<String>(_kId);
+    if (id != null) return id;
+    final fresh = 'local-${DateTime.now().microsecondsSinceEpoch}';
+    _box.write(_kId, fresh);
+    return fresh;
+  }
 
   /// Имя пользователя (пустое, пока не введено в онбординге).
   String get name => _box.read<String>(_kName) ?? '';

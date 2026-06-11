@@ -29,6 +29,9 @@ abstract interface class ProgressRepository {
   /// Идентификаторы выученных слов темы (для точного прогресса по блокам).
   Future<Set<int>> getLearnedWordIds(String userId, int topicId);
 
+  /// Выучено слов по каждой теме (topicId → count) одним запросом.
+  Future<Map<int, int>> getLearnedWordCountsPerTopic(String userId);
+
   /// Индексы завершённых блоков темы в заданной области (слова/фразы).
   Future<Set<int>> getCompletedBlockIndices(
     String userId,

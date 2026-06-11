@@ -68,6 +68,11 @@ class DriftProgressRepository implements ProgressRepository {
   }
 
   @override
+  Future<Map<int, int>> getLearnedWordCountsPerTopic(String userId) {
+    return _dao.countLearnedWordsPerTopic(userId);
+  }
+
+  @override
   Future<Set<int>> getCompletedBlockIndices(
     String userId,
     int topicId,

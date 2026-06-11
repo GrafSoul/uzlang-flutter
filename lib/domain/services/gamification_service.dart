@@ -75,6 +75,9 @@ class GamificationService {
   /// Оценка пройденных минут из заработанного XP (обратное к [dailyGoalXp]).
   static int minutesFromXp(int xp) => (xp / 10).round();
 
-  String _dayKey(DateTime d) =>
+  /// Ключ дня `YYYY-MM-DD` — единый формат для streak/todayXp по приложению.
+  static String dayKey(DateTime d) =>
       '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
+
+  String _dayKey(DateTime d) => dayKey(d);
 }

@@ -75,7 +75,7 @@ class HomeController extends GetxController {
       dailyGoalMinutes.value = _settings.dailyGoalMinutes;
       final s = await _progress.getStats(userId);
       stats.value = s;
-      final today = _todayKey();
+      final today = GamificationService.dayKey(DateTime.now());
       todayMinutes.value = s.todayDate == today
           ? GamificationService.minutesFromXp(s.todayXp)
           : 0;
@@ -108,8 +108,4 @@ class HomeController extends GetxController {
     await load(silent: true);
   }
 
-  String _todayKey() {
-    final d = DateTime.now();
-    return '${d.year}-${d.month.toString().padLeft(2, '0')}-${d.day.toString().padLeft(2, '0')}';
-  }
 }
