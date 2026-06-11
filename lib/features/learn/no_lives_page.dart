@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../app/routes/app_routes.dart';
+import '../../core/services/lives_service.dart';
 import '../../core/theme/theme.dart';
 import '../shared/widgets/widgets.dart';
 import 'lesson_args.dart';
@@ -37,7 +38,7 @@ class NoLivesPage extends StatelessWidget {
                     children: [
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
-                        children: const [
+                        children: [
                           AppIcon(AppIcons.heart,
                               color: AppColors.textMuted, size: 28),
                           SizedBox(width: AppDimens.spaceMd),
@@ -52,7 +53,7 @@ class NoLivesPage extends StatelessWidget {
                       Text('Жизни закончились', style: AppTextStyles.title),
                       const SizedBox(height: AppDimens.spaceSm),
                       Text(
-                        'В тесте можно ошибаться 3 раза.\nЖизни восстановятся со временем.',
+                        'В тесте можно ошибаться 3 раза.\nЖизни восстановятся с началом нового дня.',
                         textAlign: TextAlign.center,
                         style: AppTextStyles.bodyRegular
                             .copyWith(color: AppColors.textSecondary),
@@ -72,12 +73,15 @@ class NoLivesPage extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const AppIcon(AppIcons.clock,
+                            AppIcon(AppIcons.clock,
                                 color: AppColors.accent,
                                 size: AppDimens.iconSm),
                             const SizedBox(width: AppDimens.spaceSm),
-                            Text('Новая жизнь через 24:00',
-                                style: AppTextStyles.label),
+                            Text(
+                              'Новая жизнь через '
+                              '${LivesService.restoreLabel()}',
+                              style: AppTextStyles.label,
+                            ),
                           ],
                         ),
                       ),
@@ -131,7 +135,7 @@ class _CircleBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
-      shape: const CircleBorder(side: BorderSide(color: AppColors.line)),
+      shape: CircleBorder(side: BorderSide(color: AppColors.line)),
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),

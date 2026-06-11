@@ -22,9 +22,7 @@ class UzLangApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'UzLang',
       debugShowCheckedModeBanner: false,
-      theme: AppTheme.light,
-      darkTheme: AppTheme.dark,
-      themeMode: settings.themeMode,
+      theme: AppTheme.current,
       initialRoute: initialRoute,
       getPages: AppPages.routes,
     );

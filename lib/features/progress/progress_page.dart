@@ -101,7 +101,7 @@ class _StreakHero extends GetView<ProgressController> {
                   color: AppColors.accentTint,
                   borderRadius: BorderRadius.circular(AppDimens.radiusSm),
                 ),
-                child: const Center(
+                child: Center(
                   child: AppIcon(AppIcons.flame,
                       color: AppColors.accent, size: AppDimens.iconLg),
                 ),
@@ -144,9 +144,9 @@ class _DayDot extends StatelessWidget {
       return Container(
         width: 34,
         height: 34,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
             color: AppColors.accent, shape: BoxShape.circle),
-        child: const Center(
+        child: Center(
           child: AppIcon(AppIcons.check, color: AppColors.bg, size: 16),
         ),
       );
@@ -393,7 +393,7 @@ class _EmptyState extends StatelessWidget {
                       color: AppColors.surfaceRaised,
                       borderRadius: BorderRadius.circular(AppDimens.radiusLg),
                     ),
-                    child: const Center(
+                    child: Center(
                       child: AppIcon(AppIcons.chart,
                           color: AppColors.textMuted, size: 32),
                     ),

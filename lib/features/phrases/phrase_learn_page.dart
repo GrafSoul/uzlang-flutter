@@ -183,7 +183,7 @@ class _ListenButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: Colors.transparent,
-      shape: const StadiumBorder(side: BorderSide(color: AppColors.accent)),
+      shape: StadiumBorder(side: BorderSide(color: AppColors.accent)),
       child: InkWell(
         onTap: onTap,
         customBorder: const StadiumBorder(),
@@ -195,7 +195,7 @@ class _ListenButton extends StatelessWidget {
           child: Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const AppIcon(AppIcons.volume,
+              AppIcon(AppIcons.volume,
                   color: AppColors.accent, size: AppDimens.iconSm),
               const SizedBox(width: AppDimens.spaceSm),
               Text('Прослушать',
@@ -246,7 +246,7 @@ class _CircleBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
-      shape: const CircleBorder(side: BorderSide(color: AppColors.line)),
+      shape: CircleBorder(side: BorderSide(color: AppColors.line)),
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),

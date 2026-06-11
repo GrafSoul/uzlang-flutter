@@ -100,7 +100,7 @@ class _TopBar extends StatelessWidget {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const AppIcon(AppIcons.heart,
+                AppIcon(AppIcons.heart,
                     color: AppColors.error, size: AppDimens.iconSm),
                 const SizedBox(width: AppDimens.spaceXs),
                 Text('$lives', style: AppTextStyles.label),
@@ -174,7 +174,7 @@ class _PromptCard extends GetView<TestController> {
             child: InkWell(
               onTap: controller.playAudio,
               customBorder: const CircleBorder(),
-              child: const SizedBox(
+              child: SizedBox(
                 width: 44,
                 height: 44,
                 child: Center(
@@ -241,11 +241,11 @@ class _OptionTile extends GetView<TestController> {
                 Container(
                   width: 24,
                   height: 24,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.success,
                     shape: BoxShape.circle,
                   ),
-                  child: const Center(
+                  child: Center(
                     child:
                         AppIcon(AppIcons.check, color: AppColors.bg, size: 14),
                   ),
@@ -268,7 +268,7 @@ class _CircleBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
-      shape: const CircleBorder(side: BorderSide(color: AppColors.line)),
+      shape: CircleBorder(side: BorderSide(color: AppColors.line)),
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),

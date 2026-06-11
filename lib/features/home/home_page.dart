@@ -215,11 +215,11 @@ class _ContinueCard extends GetView<HomeController> {
                   Container(
                     width: 44,
                     height: 44,
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       color: AppColors.bg,
                       shape: BoxShape.circle,
                     ),
-                    child: const Center(
+                    child: Center(
                       child: AppIcon(AppIcons.play,
                           color: AppColors.accent, size: AppDimens.iconMd),
                     ),
@@ -233,7 +233,7 @@ class _ContinueCard extends GetView<HomeController> {
                   value: tp.percent,
                   minHeight: 8,
                   backgroundColor: AppColors.onAccent.withValues(alpha: 0.25),
-                  valueColor: const AlwaysStoppedAnimation(AppColors.bg),
+                  valueColor: AlwaysStoppedAnimation(AppColors.bg),
                 ),
               ),
               const SizedBox(height: AppDimens.spaceSm),
@@ -318,7 +318,7 @@ class _TopicTile extends StatelessWidget {
           ),
           const SizedBox(width: AppDimens.spaceSm),
           if (locked)
-            const AppIcon(AppIcons.lock, color: AppColors.textMuted)
+            AppIcon(AppIcons.lock, color: AppColors.textMuted)
           else
             _PercentBadge(percent: progress.percentInt),
         ],
@@ -350,7 +350,7 @@ class _PercentBadge extends StatelessWidget {
     return Container(
       width: 44,
       height: 44,
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.surfaceRaised,
         shape: BoxShape.circle,
       ),
@@ -374,7 +374,7 @@ class _RoundIconButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
-      shape: const CircleBorder(side: BorderSide(color: AppColors.line)),
+      shape: CircleBorder(side: BorderSide(color: AppColors.line)),
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),

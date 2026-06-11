@@ -136,7 +136,7 @@ class _Card extends GetView<ReviewController> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const AppIcon(AppIcons.refresh,
+                AppIcon(AppIcons.refresh,
                     color: AppColors.accent, size: 14),
                 const SizedBox(width: AppDimens.spaceXs),
                 Text('ПОВТОР',
@@ -162,7 +162,7 @@ class _Card extends GetView<ReviewController> {
             child: InkWell(
               onTap: controller.playAudio,
               customBorder: const CircleBorder(),
-              child: const SizedBox(
+              child: SizedBox(
                 width: 44,
                 height: 44,
                 child: Center(
@@ -313,7 +313,7 @@ class _CircleBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
-      shape: const CircleBorder(side: BorderSide(color: AppColors.line)),
+      shape: CircleBorder(side: BorderSide(color: AppColors.line)),
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),

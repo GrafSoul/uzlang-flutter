@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 
 import '../../app/routes/app_routes.dart';
 import '../../core/services/audio_service.dart';
+import '../../core/services/lives_service.dart';
 import '../../core/services/user_service.dart';
 import '../../domain/entities/phrase.dart';
 import '../../domain/entities/enums.dart';
@@ -46,6 +47,7 @@ class PhraseTestController extends GetxController {
     this._audio,
     this._lesson,
     this._progress,
+    this._lives,
   );
 
   final ContentRepository _content;
@@ -53,9 +55,9 @@ class PhraseTestController extends GetxController {
   final AudioService _audio;
   final LessonService _lesson;
   final ProgressRepository _progress;
+  final LivesService _lives;
 
   static const int _maxQuestions = 10;
-  static const int _maxLives = 3;
 
   /// Аргументы сессии.
   late final LessonArgs args;
@@ -66,8 +68,8 @@ class PhraseTestController extends GetxController {
   /// Индекс текущего вопроса.
   final RxInt index = 0.obs;
 
-  /// Оставшиеся жизни.
-  final RxInt lives = _maxLives.obs;
+  /// Оставшиеся жизни (дневной пул, восстанавливается в полночь).
+  late final RxInt lives = _lives.lives.obs;
 
   /// Число верных ответов.
   final RxInt correct = 0.obs;
@@ -101,6 +103,13 @@ class PhraseTestController extends GetxController {
   void onInit() {
     super.onInit();
     args = Get.arguments as LessonArgs;
+    if (lives.value <= 0) {
+      // Жизни на сегодня кончились — сразу на экран «Нет жизней».
+      Future<void>.microtask(
+        () => Get.offNamed<void>(Routes.noLives, arguments: args),
+      );
+      return;
+    }
     load();
   }
 
@@ -166,6 +175,7 @@ class PhraseTestController extends GetxController {
       correct.value++;
     } else {
       lives.value--;
+      _lives.consume();
     }
   }
 

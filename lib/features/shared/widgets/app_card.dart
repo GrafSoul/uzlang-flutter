@@ -14,7 +14,7 @@ class AppCard extends StatelessWidget {
     this.onTap,
     this.padding = const EdgeInsets.all(AppDimens.spaceLg),
     this.radius = AppDimens.radiusLg,
-    this.color = AppColors.surface,
+    this.color,
     this.bordered = true,
     super.key,
   });
@@ -31,8 +31,8 @@ class AppCard extends StatelessWidget {
   /// Радиус скругления.
   final double radius;
 
-  /// Цвет поверхности.
-  final Color color;
+  /// Цвет поверхности (по умолчанию — [AppColors.surface]).
+  final Color? color;
 
   /// Рисовать ли тонкую обводку линией.
   final bool bordered;
@@ -42,7 +42,7 @@ class AppCard extends StatelessWidget {
     final BorderRadius borderRadius = BorderRadius.circular(radius);
 
     return Material(
-      color: color,
+      color: color ?? AppColors.surface,
       borderRadius: borderRadius,
       child: InkWell(
         onTap: onTap,

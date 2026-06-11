@@ -146,7 +146,7 @@ class _Tile extends StatelessWidget {
                         minHeight: 6,
                         backgroundColor: AppColors.line,
                         valueColor:
-                            const AlwaysStoppedAnimation(AppColors.accent),
+                            AlwaysStoppedAnimation(AppColors.accent),
                       ),
                     ),
                   ],
@@ -208,16 +208,16 @@ class _Trailing extends StatelessWidget {
   Widget build(BuildContext context) {
     switch (progress.status) {
       case TopicStatus.locked:
-        return const AppIcon(AppIcons.lock, color: AppColors.textMuted);
+        return AppIcon(AppIcons.lock, color: AppColors.textMuted);
       case TopicStatus.available:
         return Container(
           width: 36,
           height: 36,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.accent,
             shape: BoxShape.circle,
           ),
-          child: const Center(
+          child: Center(
             child: AppIcon(AppIcons.chevronRight,
                 color: AppColors.onAccent, size: AppDimens.iconSm),
           ),
@@ -246,7 +246,7 @@ class _CircleBack extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
-      shape: const CircleBorder(side: BorderSide(color: AppColors.line)),
+      shape: CircleBorder(side: BorderSide(color: AppColors.line)),
       child: InkWell(
         onTap: Get.back,
         customBorder: const CircleBorder(),

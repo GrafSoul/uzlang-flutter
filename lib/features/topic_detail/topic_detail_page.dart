@@ -157,7 +157,7 @@ class _StreakPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const AppIcon(AppIcons.flame,
+          AppIcon(AppIcons.flame,
               color: AppColors.accent, size: AppDimens.iconSm),
           const SizedBox(width: AppDimens.spaceXs),
           Text('$value', style: AppTextStyles.label),
@@ -376,11 +376,11 @@ class _BlockCard extends StatelessWidget {
             Container(
               width: 36,
               height: 36,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 color: AppColors.accent,
                 shape: BoxShape.circle,
               ),
-              child: const Center(
+              child: Center(
                 child: AppIcon(AppIcons.play,
                     color: AppColors.onAccent, size: AppDimens.iconSm),
               ),
@@ -410,11 +410,11 @@ class _BlockMarker extends StatelessWidget {
         return Container(
           width: 36,
           height: 36,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.success,
             shape: BoxShape.circle,
           ),
-          child: const Center(
+          child: Center(
             child: AppIcon(AppIcons.check,
                 color: AppColors.bg, size: AppDimens.iconSm),
           ),
@@ -423,7 +423,7 @@ class _BlockMarker extends StatelessWidget {
         return Container(
           width: 36,
           height: 36,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.accent,
             shape: BoxShape.circle,
           ),
@@ -435,11 +435,11 @@ class _BlockMarker extends StatelessWidget {
         return Container(
           width: 36,
           height: 36,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.surface,
             shape: BoxShape.circle,
           ),
-          child: const Center(
+          child: Center(
             child: AppIcon(AppIcons.lock,
                 color: AppColors.textMuted, size: AppDimens.iconSm),
           ),
@@ -460,11 +460,11 @@ class _PhrasesLocked extends GetView<TopicDetailController> {
         Container(
           width: 80,
           height: 80,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.surfaceRaised,
             shape: BoxShape.circle,
           ),
-          child: const Center(
+          child: Center(
             child: AppIcon(AppIcons.lock,
                 color: AppColors.textMuted, size: 32),
           ),
@@ -508,7 +508,7 @@ class _PhrasesLocked extends GetView<TopicDetailController> {
                   minHeight: 8,
                   backgroundColor: AppColors.line,
                   valueColor:
-                      const AlwaysStoppedAnimation(AppColors.accent),
+                      AlwaysStoppedAnimation(AppColors.accent),
                 ),
               ),
             ],
@@ -543,7 +543,7 @@ class _PhrasesLocked extends GetView<TopicDetailController> {
                           style: AppTextStyles.label
                               .copyWith(color: AppColors.textMuted)),
                     ),
-                    const AppIcon(AppIcons.lock,
+                    AppIcon(AppIcons.lock,
                         color: AppColors.textMuted, size: AppDimens.iconSm),
                   ],
                 ),
@@ -598,7 +598,7 @@ class _CircleBack extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
-      shape: const CircleBorder(side: BorderSide(color: AppColors.line)),
+      shape: CircleBorder(side: BorderSide(color: AppColors.line)),
       child: InkWell(
         onTap: Get.back,
         customBorder: const CircleBorder(),

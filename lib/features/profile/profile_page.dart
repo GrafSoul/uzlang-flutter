@@ -179,9 +179,9 @@ class _ProfileCard extends GetView<ProfileController> {
           decoration: InputDecoration(
             hintText: 'Имя',
             hintStyle: AppTextStyles.body.copyWith(color: AppColors.textMuted),
-            enabledBorder: const UnderlineInputBorder(
+            enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: AppColors.line)),
-            focusedBorder: const UnderlineInputBorder(
+            focusedBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: AppColors.accent)),
           ),
         ),
@@ -293,7 +293,7 @@ class _NavRow extends StatelessWidget {
                 style: AppTextStyles.label
                     .copyWith(color: AppColors.textSecondary)),
           const SizedBox(width: AppDimens.spaceSm),
-          const AppIcon(AppIcons.chevronRight,
+          AppIcon(AppIcons.chevronRight,
               color: AppColors.textMuted, size: AppDimens.iconSm),
         ],
       ),
@@ -394,7 +394,7 @@ class _CircleBtn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
-      shape: const CircleBorder(side: BorderSide(color: AppColors.line)),
+      shape: CircleBorder(side: BorderSide(color: AppColors.line)),
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),

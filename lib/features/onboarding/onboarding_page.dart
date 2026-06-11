@@ -80,7 +80,7 @@ class _CircleButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return Material(
       color: AppColors.surface,
-      shape: const CircleBorder(side: BorderSide(color: AppColors.line)),
+      shape: CircleBorder(side: BorderSide(color: AppColors.line)),
       child: InkWell(
         onTap: onTap,
         customBorder: const CircleBorder(),
@@ -196,7 +196,7 @@ class _WelcomeStep extends GetView<OnboardingController> {
                     color: AppColors.accent,
                     borderRadius: BorderRadius.circular(AppDimens.radiusLg),
                   ),
-                  child: const Center(
+                  child: Center(
                     child: AppIcon(AppIcons.book,
                         color: AppColors.onAccent, size: 30),
                   ),
@@ -263,12 +263,12 @@ class _NameStep extends GetView<OnboardingController> {
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppDimens.radiusMd),
-                      borderSide: const BorderSide(color: AppColors.accent),
+                      borderSide: BorderSide(color: AppColors.accent),
                     ),
                     focusedBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(AppDimens.radiusMd),
                       borderSide:
-                          const BorderSide(color: AppColors.accent, width: 1.5),
+                          BorderSide(color: AppColors.accent, width: 1.5),
                     ),
                   ),
                 ),
@@ -646,11 +646,11 @@ class _CheckCircle extends StatelessWidget {
       return Container(
         width: 26,
         height: 26,
-        decoration: const BoxDecoration(
+        decoration: BoxDecoration(
           color: AppColors.accent,
           shape: BoxShape.circle,
         ),
-        child: const Center(
+        child: Center(
           child: AppIcon(AppIcons.check, color: AppColors.onAccent, size: 16),
         ),
       );

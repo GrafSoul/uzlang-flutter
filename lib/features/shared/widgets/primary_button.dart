@@ -40,7 +40,7 @@ class PrimaryButton extends StatelessWidget {
     final bool disabled = onPressed == null || isLoading;
 
     final Widget child = isLoading
-        ? const SizedBox(
+        ? SizedBox(
             width: AppDimens.iconMd,
             height: AppDimens.iconMd,
             child: CircularProgressIndicator(

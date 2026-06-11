@@ -1,7 +1,8 @@
-import 'package:flutter/material.dart' show ThemeMode;
+import 'package:flutter/material.dart' show Brightness, ThemeMode;
 import 'package:get/get.dart';
 
 import '../../core/services/settings_service.dart';
+import '../../core/theme/theme.dart';
 import '../../core/services/user_service.dart';
 import '../../domain/entities/enums.dart';
 import '../../domain/entities/user_stats.dart';
@@ -103,11 +104,19 @@ class ProfileController extends GetxController {
     dailyGoal.value = minutes;
   }
 
-  /// Меняет тему и сразу применяет её.
+  /// Меняет тему и сразу применяет её: палитра + системные бары +
+  /// полный ребилд дерева (цвета берутся из активной палитры).
   Future<void> setThemeMode(ThemeMode mode) async {
     await _settings.setThemeMode(mode);
     themeMode.value = mode;
-    Get.changeThemeMode(mode);
+    AppColors.apply(
+      mode,
+      platform: Get.mediaQuery.platformBrightness == Brightness.dark
+          ? Brightness.dark
+          : Brightness.light,
+    );
+    applySystemBars();
+    await Get.forceAppUpdate();
   }
 
   /// Переключает звук.

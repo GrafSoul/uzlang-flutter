@@ -15,7 +15,7 @@ abstract final class AppTextStyles {
   static const String fontFamily = 'Inter';
 
   /// Display / 44 Bold (lh 52). Крупные заголовки онбординга.
-  static const TextStyle display = TextStyle(
+  static TextStyle get display => TextStyle(
     fontFamily: fontFamily,
     fontSize: 44,
     height: 52 / 44,
@@ -24,7 +24,7 @@ abstract final class AppTextStyles {
   );
 
   /// Word / 40 Bold (lh 48). Слово на карточке (узбекская латиница).
-  static const TextStyle word = TextStyle(
+  static TextStyle get word => TextStyle(
     fontFamily: fontFamily,
     fontSize: 40,
     height: 48 / 40,
@@ -33,7 +33,7 @@ abstract final class AppTextStyles {
   );
 
   /// Title / 28 Bold (lh 34). Заголовок экрана.
-  static const TextStyle title = TextStyle(
+  static TextStyle get title => TextStyle(
     fontFamily: fontFamily,
     fontSize: 28,
     height: 34 / 28,
@@ -42,7 +42,7 @@ abstract final class AppTextStyles {
   );
 
   /// Heading / 24 Bold (lh 30). Заголовок секции/карточки.
-  static const TextStyle heading = TextStyle(
+  static TextStyle get heading => TextStyle(
     fontFamily: fontFamily,
     fontSize: 24,
     height: 30 / 24,
@@ -51,7 +51,7 @@ abstract final class AppTextStyles {
   );
 
   /// Subheading / 22 Bold (lh 28).
-  static const TextStyle subheading = TextStyle(
+  static TextStyle get subheading => TextStyle(
     fontFamily: fontFamily,
     fontSize: 22,
     height: 28 / 22,
@@ -60,7 +60,7 @@ abstract final class AppTextStyles {
   );
 
   /// Body / 16 Medium (lh 22). Основной текст.
-  static const TextStyle body = TextStyle(
+  static TextStyle get body => TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
     height: 22 / 16,
@@ -69,7 +69,7 @@ abstract final class AppTextStyles {
   );
 
   /// Body / 15 Regular (lh 22). Вторичный абзац.
-  static const TextStyle bodyRegular = TextStyle(
+  static TextStyle get bodyRegular => TextStyle(
     fontFamily: fontFamily,
     fontSize: 15,
     height: 22 / 15,
@@ -78,7 +78,7 @@ abstract final class AppTextStyles {
   );
 
   /// Reading / 16 Regular (lh 22). Кириллица-чтение под словом.
-  static const TextStyle reading = TextStyle(
+  static TextStyle get reading => TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
     height: 22 / 16,
@@ -87,7 +87,7 @@ abstract final class AppTextStyles {
   );
 
   /// Label / 14 Semi Bold (lh 18). Подписи, теги.
-  static const TextStyle label = TextStyle(
+  static TextStyle get label => TextStyle(
     fontFamily: fontFamily,
     fontSize: 14,
     height: 18 / 14,
@@ -96,7 +96,7 @@ abstract final class AppTextStyles {
   );
 
   /// Label / 13 Semi Bold (lh 16). Мелкие подписи.
-  static const TextStyle labelSmall = TextStyle(
+  static TextStyle get labelSmall => TextStyle(
     fontFamily: fontFamily,
     fontSize: 13,
     height: 16 / 13,
@@ -105,7 +105,7 @@ abstract final class AppTextStyles {
   );
 
   /// Caption / 11 Bold (lh 14). Метаданные, счётчики, оверлайны.
-  static const TextStyle caption = TextStyle(
+  static TextStyle get caption => TextStyle(
     fontFamily: fontFamily,
     fontSize: 11,
     height: 14 / 11,
@@ -114,7 +114,7 @@ abstract final class AppTextStyles {
   );
 
   /// Текст основной кнопки — Inter Bold 16 (как CTA в макете).
-  static const TextStyle button = TextStyle(
+  static TextStyle get button => TextStyle(
     fontFamily: fontFamily,
     fontSize: 16,
     height: 1,

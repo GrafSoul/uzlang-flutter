@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
@@ -7,6 +6,7 @@ import 'package:get_storage/get_storage.dart';
 import 'app/app.dart';
 import 'app/bindings/initial_binding.dart';
 import 'core/services/get_storage_seed_version_store.dart';
+import 'core/services/settings_service.dart';
 import 'core/theme/theme.dart';
 import 'data/local/database/app_database.dart';
 import 'data/local/seed/content_seeder.dart';
@@ -32,26 +32,21 @@ Future<void> main() async {
         color: AppColors.bg,
         alignment: Alignment.center,
         padding: const EdgeInsets.all(24),
-        child: const Text(
+        child: Text(
           'Что-то пошло не так',
           textDirection: TextDirection.ltr,
           style: TextStyle(color: AppColors.textSecondary, fontSize: 16),
         ),
       );
 
-  // Системные бары под тёмную тему DS (низ Android — тёмный, иконки светлые).
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Color(0x00000000),
-      statusBarIconBrightness: Brightness.light,
-      statusBarBrightness: Brightness.dark,
-      systemNavigationBarColor: AppColors.bg,
-      systemNavigationBarDividerColor: AppColors.bg,
-      systemNavigationBarIconBrightness: Brightness.light,
-    ),
-  );
-
   await GetStorage.init();
+
+  // Палитра по сохранённой теме (до построения дерева) + системные бары.
+  AppColors.apply(
+    SettingsService(GetStorage()).themeMode,
+    platform: WidgetsBinding.instance.platformDispatcher.platformBrightness,
+  );
+  applySystemBars();
 
   // Локальная БД — единственный экземпляр на сеанс.
   final db = AppDatabase();

@@ -11,7 +11,7 @@ void main() {
     var tapped = false;
     await tester.pumpWidget(
       MaterialApp(
-        theme: AppTheme.dark,
+        theme: AppTheme.current,
         home: Scaffold(
           body: PrimaryButton(
             label: 'Продолжить',

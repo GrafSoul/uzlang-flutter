@@ -70,7 +70,7 @@ class _Sheet extends StatelessWidget {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.fromLTRB(20, 14, 20, 28),
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         color: AppColors.bg,
         border: Border(
           top: BorderSide(color: AppColors.line),
@@ -253,11 +253,11 @@ class _ScriptOption extends StatelessWidget {
                 Container(
                   width: 26,
                   height: 26,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.accent,
                     shape: BoxShape.circle,
                   ),
-                  child: const Center(
+                  child: Center(
                     child: AppIcon(
                       AppIcons.check,
                       color: AppColors.onAccent,

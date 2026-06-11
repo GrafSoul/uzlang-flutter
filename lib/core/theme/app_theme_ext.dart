@@ -45,8 +45,8 @@ class AppThemeExt extends ThemeExtension<AppThemeExt> {
   /// Приглушённый текст.
   final Color textMuted;
 
-  /// Тёмная (основная) схема — значения из [AppColors].
-  static const AppThemeExt dark = AppThemeExt(
+  /// Текущая схема — значения из активной палитры [AppColors].
+  static AppThemeExt get current => AppThemeExt(
     surfaceRaised: AppColors.surfaceRaised,
     line: AppColors.line,
     accentTint: AppColors.accentTint,

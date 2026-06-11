@@ -200,9 +200,9 @@ class _OptionTile extends StatelessWidget {
             Container(
               width: 26,
               height: 26,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                   color: AppColors.accent, shape: BoxShape.circle),
-              child: const Center(
+              child: Center(
                 child:
                     AppIcon(AppIcons.check, color: AppColors.onAccent, size: 16),
               ),

@@ -106,11 +106,11 @@ class _CheckBadge extends StatelessWidget {
         child: Container(
           width: 68,
           height: 68,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.accent,
             shape: BoxShape.circle,
           ),
-          child: const Center(
+          child: Center(
             child: AppIcon(AppIcons.check, color: AppColors.bg, size: 32),
           ),
         ),
@@ -214,7 +214,7 @@ class _UnlockBanner extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const AppIcon(AppIcons.check,
+          AppIcon(AppIcons.check,
               color: AppColors.success, size: AppDimens.iconMd),
           const SizedBox(width: AppDimens.spaceSm),
           Text(
