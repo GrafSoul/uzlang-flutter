@@ -10,7 +10,9 @@ part 'progress_dao.g.dart';
 ///
 /// Тонкий слой: апсерты и выборки. Расчёт интервалов (FSRS) и геймификация —
 /// в domain-сервисах, которые вызывают эти методы.
-@DriftAccessor(tables: [CardProgress, UserStats, BlockProgress, Words])
+@DriftAccessor(
+  tables: [CardProgress, UserStats, BlockProgress, Words, DailyActivity],
+)
 class ProgressDao extends DatabaseAccessor<AppDatabase>
     with _$ProgressDaoMixin {
   /// Создаёт DAO, привязанный к базе [db].
@@ -177,6 +179,28 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
         ],
       ),
     );
+  }
+
+  /// Прибавляет [delta] XP ко дню [day] (строка дня создаётся при первом XP).
+  Future<void> addDailyXp(String userId, String day, int delta) {
+    return into(dailyActivity).insert(
+      DailyActivityCompanion.insert(userId: userId, day: day, xp: Value(delta)),
+      onConflict: DoUpdate(
+        (old) => DailyActivityCompanion.custom(
+          xp: old.xp + Variable<int>(delta),
+        ),
+        target: [dailyActivity.userId, dailyActivity.day],
+      ),
+    );
+  }
+
+  /// XP по дням начиная с [fromDay] включительно (день → XP).
+  Future<Map<String, int>> xpByDaySince(String userId, String fromDay) async {
+    final rows = await (select(dailyActivity)
+          ..where((d) =>
+              d.userId.equals(userId) & d.day.isBiggerOrEqualValue(fromDay)))
+        .get();
+    return {for (final r in rows) r.day: r.xp};
   }
 
   /// Отмечает блок пройденным (точность + момент завершения).

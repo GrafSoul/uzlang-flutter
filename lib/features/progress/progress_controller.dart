@@ -54,6 +54,9 @@ class ProgressController extends GetxController {
   /// Достижения.
   final RxList<Achievement> achievements = <Achievement>[].obs;
 
+  /// Минуты по дням текущей недели (Пн…Вс) из истории активности.
+  final RxList<int> weekMinutes = List.filled(7, 0).obs;
+
   /// Идёт ли загрузка.
   final RxBool isLoading = true.obs;
 
@@ -114,6 +117,18 @@ class ProgressController extends GetxController {
       learnedWords.value = await _progress.getTotalLearnedWords(userId);
       accuracy.value = await _progress.getAverageAccuracy(userId);
       achievements.value = _achievements.evaluate(s);
+
+      // Неделя: XP по дням с понедельника → минуты на каждый день.
+      final now = DateTime.now();
+      final monday = now.subtract(Duration(days: now.weekday - 1));
+      final xpByDay = await _progress.getXpByDaySince(
+        userId,
+        GamificationService.dayKey(monday),
+      );
+      weekMinutes.value = List.generate(7, (i) {
+        final day = GamificationService.dayKey(monday.add(Duration(days: i)));
+        return GamificationService.minutesFromXp(xpByDay[day] ?? 0);
+      });
     } finally {
       isLoading.value = false;
     }

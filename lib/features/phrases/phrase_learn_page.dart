@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/theme/theme.dart';
+import '../../core/utils/script_display.dart';
 import '../shared/widgets/widgets.dart';
 import 'phrase_learn_controller.dart';
 
@@ -103,6 +104,8 @@ class _PhraseCard extends GetView<PhraseLearnController> {
   @override
   Widget build(BuildContext context) {
     final p = controller.current;
+    final pair =
+        ScriptDisplay.of(controller.scriptMode.value, p.uz, p.reading);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(AppDimens.spaceXl),
@@ -128,9 +131,9 @@ class _PhraseCard extends GetView<PhraseLearnController> {
                 )),
           ),
           const SizedBox(height: AppDimens.spaceMd),
-          Text(p.uz, style: AppTextStyles.word, textAlign: TextAlign.center),
+          Text(pair.main, style: AppTextStyles.word, textAlign: TextAlign.center),
           const SizedBox(height: AppDimens.spaceSm),
-          Text('[ ${p.reading} ]',
+          Text(pair.sub,
               style: AppTextStyles.reading, textAlign: TextAlign.center),
           const SizedBox(height: AppDimens.spaceLg),
           Container(width: 40, height: 1, color: AppColors.line),

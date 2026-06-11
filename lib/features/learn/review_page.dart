@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../core/services/settings_service.dart';
 import '../../core/theme/theme.dart';
+import '../../core/utils/script_display.dart';
+import '../../domain/entities/word.dart';
 import '../../domain/entities/enums.dart';
 import '../shared/widgets/widgets.dart';
 import 'review_controller.dart';
@@ -143,9 +146,10 @@ class _Card extends GetView<ReviewController> {
             ),
           ),
           const SizedBox(height: AppDimens.spaceMd),
-          Text(w.uz, style: AppTextStyles.word, textAlign: TextAlign.center),
+          Text(_pair(w).main,
+              style: AppTextStyles.word, textAlign: TextAlign.center),
           const SizedBox(height: AppDimens.spaceSm),
-          Text('[ ${w.reading} ]',
+          Text(_pair(w).sub,
               style: AppTextStyles.reading, textAlign: TextAlign.center),
           const SizedBox(height: AppDimens.spaceLg),
           Container(width: 40, height: 1, color: AppColors.line),
@@ -322,3 +326,10 @@ class _CircleBtn extends StatelessWidget {
     );
   }
 }
+
+/// Отображение слова повтора по текущей письменности.
+ScriptPair _pair(Word w) => ScriptDisplay.of(
+      Get.find<SettingsService>().scriptMode,
+      w.uz,
+      w.reading,
+    );

@@ -163,6 +163,27 @@ class UserStats extends Table {
   Set<Column<Object>> get primaryKey => {userId};
 }
 
+/// Дневная активность: заработанный XP по дням (история для графиков).
+@DataClassName('DailyActivityRow')
+class DailyActivity extends Table {
+  /// Идентификатор.
+  IntColumn get id => integer().autoIncrement()();
+
+  /// Владелец.
+  TextColumn get userId => text()();
+
+  /// День в формате `YYYY-MM-DD`.
+  TextColumn get day => text()();
+
+  /// XP, заработанный за день.
+  IntColumn get xp => integer().withDefault(const Constant(0))();
+
+  @override
+  List<Set<Column<Object>>> get uniqueKeys => [
+        {userId, day},
+      ];
+}
+
 /// Прогресс по блокам (20 карточек): завершение, точность, разблокировка.
 @DataClassName('BlockProgressRow')
 class BlockProgress extends Table {

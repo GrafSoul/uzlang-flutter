@@ -112,6 +112,14 @@ class DriftProgressRepository implements ProgressRepository {
       _dao.averageAccuracy(userId);
 
   @override
+  Future<void> addDailyXp(String userId, String day, int xp) =>
+      _dao.addDailyXp(userId, day, xp);
+
+  @override
+  Future<Map<String, int>> getXpByDaySince(String userId, String fromDay) =>
+      _dao.xpByDaySince(userId, fromDay);
+
+  @override
   Future<void> saveStats(String userId, UserStats stats) {
     return _dao.upsertStats(
       UserStatsCompanion.insert(

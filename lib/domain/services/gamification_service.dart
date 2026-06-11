@@ -41,6 +41,7 @@ class GamificationService {
       todayDate: todayKey,
     );
     await _progress.saveStats(userId, updated);
+    await _progress.addDailyXp(userId, todayKey, blockXp);
     return updated;
   }
 

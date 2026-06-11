@@ -56,4 +56,10 @@ abstract interface class ProgressRepository {
 
   /// Средняя точность по завершённым блокам (0..1).
   Future<double> getAverageAccuracy(String userId);
+
+  /// Прибавляет XP ко дню [day] (`YYYY-MM-DD`) для истории активности.
+  Future<void> addDailyXp(String userId, String day, int xp);
+
+  /// XP по дням начиная с [fromDay] включительно (день → XP).
+  Future<Map<String, int>> getXpByDaySince(String userId, String fromDay);
 }

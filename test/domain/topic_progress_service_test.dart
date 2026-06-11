@@ -58,6 +58,14 @@ class _FakeProgress implements ProgressRepository {
       learned;
 
   @override
+  Future<void> addDailyXp(String userId, String day, int xp) =>
+      throw UnimplementedError();
+
+  @override
+  Future<Map<String, int>> getXpByDaySince(String userId, String fromDay) =>
+      throw UnimplementedError();
+
+  @override
   Future<UserStats> getStats(String userId) async => UserStats.empty;
 
   @override

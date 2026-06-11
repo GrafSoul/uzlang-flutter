@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../../core/services/settings_service.dart';
 import '../../core/theme/theme.dart';
+import '../../core/utils/script_display.dart';
 import '../shared/widgets/widgets.dart';
 import 'test_controller.dart';
 
@@ -143,6 +145,11 @@ class _PromptCard extends GetView<TestController> {
   @override
   Widget build(BuildContext context) {
     final w = controller.question.word;
+    final pair = ScriptDisplay.of(
+      Get.find<SettingsService>().scriptMode,
+      w.uz,
+      w.reading,
+    );
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(
@@ -155,9 +162,10 @@ class _PromptCard extends GetView<TestController> {
       ),
       child: Column(
         children: [
-          Text(w.uz, style: AppTextStyles.word, textAlign: TextAlign.center),
+          Text(pair.main,
+              style: AppTextStyles.word, textAlign: TextAlign.center),
           const SizedBox(height: AppDimens.spaceSm),
-          Text('[ ${w.reading} ]',
+          Text(pair.sub,
               style: AppTextStyles.reading, textAlign: TextAlign.center),
           const SizedBox(height: AppDimens.spaceMd),
           Material(

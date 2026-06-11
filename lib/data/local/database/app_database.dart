@@ -14,7 +14,15 @@ part 'app_database.g.dart';
 /// Доступ к данным — только через [ContentDao] / [ProgressDao], презентация
 /// в базу напрямую не ходит (см. репозитории в `data/repositories`).
 @DriftDatabase(
-  tables: [Topics, Words, Phrases, CardProgress, UserStats, BlockProgress],
+  tables: [
+    Topics,
+    Words,
+    Phrases,
+    CardProgress,
+    UserStats,
+    BlockProgress,
+    DailyActivity,
+  ],
   daos: [ContentDao, ProgressDao],
 )
 class AppDatabase extends _$AppDatabase {
@@ -26,7 +34,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase.forTesting(super.executor);
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
@@ -36,6 +44,10 @@ class AppDatabase extends _$AppDatabase {
             // v2: дневной XP для прогресса дневной цели.
             await m.addColumn(userStats, userStats.todayXp);
             await m.addColumn(userStats, userStats.todayDate);
+          }
+          if (from < 3) {
+            // v3: история XP по дням (недельный график).
+            await m.createTable(dailyActivity);
           }
         },
         beforeOpen: (details) async {

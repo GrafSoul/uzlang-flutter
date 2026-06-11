@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import '../../core/theme/theme.dart';
+import '../../core/utils/script_display.dart';
 import '../shared/widgets/widgets.dart';
 import 'learn_controller.dart';
+import 'lesson_settings_sheet.dart';
 
 /// Экран «Слова — Учить» — по макету Figma «04 · Слова — Учить (свайп)».
 class LearnPage extends GetView<LearnController> {
@@ -68,8 +70,17 @@ class _TopBar extends StatelessWidget {
             ),
           ),
           const SizedBox(width: AppDimens.spaceSm),
-          const AppIcon(AppIcons.settings,
-              color: AppColors.textSecondary, size: AppDimens.iconMd),
+          InkWell(
+            onTap: () => showLessonSettingsSheet(
+              scriptMode: Get.find<LearnController>().scriptMode,
+            ),
+            customBorder: const CircleBorder(),
+            child: const Padding(
+              padding: EdgeInsets.all(AppDimens.spaceXs),
+              child: AppIcon(AppIcons.settings,
+                  color: AppColors.textSecondary, size: AppDimens.iconMd),
+            ),
+          ),
           const SizedBox(width: AppDimens.spaceSm),
         ],
       ),
@@ -111,6 +122,7 @@ class _WordCard extends GetView<LearnController> {
   @override
   Widget build(BuildContext context) {
     final w = controller.current;
+    final pair = ScriptDisplay.of(controller.scriptMode.value, w.uz, w.reading);
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(
@@ -124,9 +136,10 @@ class _WordCard extends GetView<LearnController> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(w.uz, style: AppTextStyles.word, textAlign: TextAlign.center),
+          Text(pair.main,
+              style: AppTextStyles.word, textAlign: TextAlign.center),
           const SizedBox(height: AppDimens.spaceSm),
-          Text('[ ${w.reading} ]',
+          Text(pair.sub,
               style: AppTextStyles.reading, textAlign: TextAlign.center),
           const SizedBox(height: AppDimens.spaceLg),
           Container(width: 40, height: 1, color: AppColors.line),

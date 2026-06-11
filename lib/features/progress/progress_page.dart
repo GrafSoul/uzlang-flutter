@@ -275,8 +275,9 @@ class _WeekChart extends GetView<ProgressController> {
   Widget build(BuildContext context) {
     final days = controller.weekDays;
     final todayIdx = DateTime.now().weekday - 1;
-    final todayMin = controller.todayMinutes;
-    final maxMin = todayMin < 10 ? 10 : todayMin;
+    final minutes = controller.weekMinutes;
+    final maxOfWeek = minutes.fold<int>(0, (a, b) => a > b ? a : b);
+    final maxMin = maxOfWeek < 10 ? 10 : maxOfWeek;
     return Container(
       height: 140,
       padding: const EdgeInsets.all(AppDimens.spaceMd),
@@ -293,7 +294,7 @@ class _WeekChart extends GetView<ProgressController> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Container(
-                    height: 8 + (i == todayIdx ? (todayMin / maxMin) * 70 : 0),
+                    height: 8 + (minutes[i] / maxMin) * 70,
                     margin: const EdgeInsets.symmetric(horizontal: 4),
                     decoration: BoxDecoration(
                       color:

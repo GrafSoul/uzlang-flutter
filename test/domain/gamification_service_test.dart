@@ -18,6 +18,18 @@ class _FakeProgress implements ProgressRepository {
   Future<void> saveStats(String userId, UserStats stats) async =>
       _stats = stats;
 
+  /// История XP по дням (тестовый разрез).
+  final Map<String, int> daily = {};
+
+  @override
+  Future<void> addDailyXp(String userId, String day, int xp) async =>
+      daily[day] = (daily[day] ?? 0) + xp;
+
+  @override
+  Future<Map<String, int>> getXpByDaySince(
+          String userId, String fromDay) async =>
+      {for (final e in daily.entries) if (e.key.compareTo(fromDay) >= 0) e.key: e.value};
+
   @override
   dynamic noSuchMethod(Invocation invocation) =>
       throw UnimplementedError(invocation.memberName.toString());

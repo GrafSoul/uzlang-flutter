@@ -3,6 +3,7 @@ import 'package:get/get.dart';
 import '../../app/routes/app_routes.dart';
 import '../../core/services/audio_service.dart';
 import '../../core/services/lesson_resume_store.dart';
+import '../../core/services/settings_service.dart';
 import '../../core/services/user_service.dart';
 import '../../domain/entities/card_progress.dart';
 import '../../domain/entities/enums.dart';
@@ -27,6 +28,7 @@ class LearnController extends GetxController {
     this._user,
     this._audio,
     this._resume,
+    this._settings,
   );
 
   final ContentRepository _content;
@@ -35,6 +37,10 @@ class LearnController extends GetxController {
   final UserService _user;
   final AudioService _audio;
   final LessonResumeStore _resume;
+  final SettingsService _settings;
+
+  /// Текущая письменность карточек (меняется на лету из «Настроек урока»).
+  late final Rx<ScriptMode> scriptMode = _settings.scriptMode.obs;
 
   /// Аргументы сессии.
   late final LessonArgs args;
