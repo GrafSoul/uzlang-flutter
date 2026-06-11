@@ -6,6 +6,7 @@ import 'package:get_storage/get_storage.dart';
 import 'app/app.dart';
 import 'app/bindings/initial_binding.dart';
 import 'core/services/get_storage_seed_version_store.dart';
+import 'core/services/notification_service.dart';
 import 'core/services/settings_service.dart';
 import 'core/theme/theme.dart';
 import 'data/local/database/app_database.dart';
@@ -61,6 +62,17 @@ Future<void> main() async {
 
   // Композиционный корень: регистрируем глобальные сервисы.
   InitialBinding().dependencies();
+
+  // Уведомления: инициализация и перепланирование ежедневного напоминания
+  // (идемпотентно; не блокирует старт).
+  final notifications = Get.find<NotificationService>();
+  await notifications.init();
+  if (Get.find<SettingsService>().remindersEnabled) {
+    // Не блокируем старт: разрешение (Android 13+) и план — в фоне.
+    notifications
+        .requestPermission()
+        .then((_) => notifications.scheduleDailyReminder());
+  }
 
   runApp(const UzLangApp());
 }

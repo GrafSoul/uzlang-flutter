@@ -6,6 +6,7 @@ import '../../core/services/audio_service.dart';
 import '../../core/services/flutter_tts_audio_service.dart';
 import '../../core/services/lesson_resume_store.dart';
 import '../../core/services/lives_service.dart';
+import '../../core/services/notification_service.dart';
 import '../../core/services/settings_service.dart';
 import '../../core/services/user_service.dart';
 import '../../data/local/database/app_database.dart';
@@ -38,6 +39,7 @@ class InitialBinding extends Bindings {
     Get.put<AccessService>(const AccessService(), permanent: true);
     Get.put<LessonResumeStore>(LessonResumeStore(box), permanent: true);
     Get.put<LivesService>(LivesService(box), permanent: true);
+    Get.put<NotificationService>(NotificationService(), permanent: true);
     Get.put<AudioService>(
       FlutterTtsAudioService(settings),
       permanent: true,

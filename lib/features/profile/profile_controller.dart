@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart' show Brightness, ThemeMode;
 import 'package:get/get.dart';
 
+import '../../core/services/notification_service.dart';
 import '../../core/services/settings_service.dart';
 import '../../core/theme/theme.dart';
 import '../../core/services/user_service.dart';
@@ -125,9 +126,17 @@ class ProfileController extends GetxController {
     soundEnabled.value = enabled;
   }
 
-  /// Переключает напоминания.
+  /// Переключает напоминания: планирует/отменяет ежедневное уведомление
+  /// (при включении запрашивает разрешение на уведомления).
   Future<void> setRemindersEnabled(bool enabled) async {
     await _settings.setRemindersEnabled(enabled);
     remindersEnabled.value = enabled;
+    final notifications = Get.find<NotificationService>();
+    if (enabled) {
+      await notifications.requestPermission();
+      await notifications.scheduleDailyReminder();
+    } else {
+      await notifications.cancelReminder();
+    }
   }
 }
