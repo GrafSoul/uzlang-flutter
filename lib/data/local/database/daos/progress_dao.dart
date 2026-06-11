@@ -118,9 +118,23 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
     return row?.read(avg) ?? 0.0;
   }
 
-  /// Вставляет/обновляет прогресс карточки (по уникальному ключу).
+  /// Вставляет/обновляет прогресс карточки.
+  ///
+  /// Конфликт-цель — уникальный ключ `(userId, cardKind, cardId)`:
+  /// `insertOnConflictUpdate` целится в PK `id` и на повторном прохождении
+  /// карточки падал бы с `UNIQUE constraint failed`.
   Future<void> upsertProgress(CardProgressCompanion progress) {
-    return into(cardProgress).insertOnConflictUpdate(progress);
+    return into(cardProgress).insert(
+      progress,
+      onConflict: DoUpdate(
+        (_) => progress,
+        target: [
+          cardProgress.userId,
+          cardProgress.cardKind,
+          cardProgress.cardId,
+        ],
+      ),
+    );
   }
 
   /// Статистика пользователя, либо `null`.
@@ -148,9 +162,21 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
         .get();
   }
 
-  /// Вставляет/обновляет прогресс блока.
+  /// Вставляет/обновляет прогресс блока (конфликт — по уникальному ключу
+  /// `(userId, topicId, scope, blockIndex)`, не по PK).
   Future<void> upsertBlock(BlockProgressCompanion block) {
-    return into(blockProgress).insertOnConflictUpdate(block);
+    return into(blockProgress).insert(
+      block,
+      onConflict: DoUpdate(
+        (_) => block,
+        target: [
+          blockProgress.userId,
+          blockProgress.topicId,
+          blockProgress.scope,
+          blockProgress.blockIndex,
+        ],
+      ),
+    );
   }
 
   /// Отмечает блок пройденным (точность + момент завершения).
@@ -162,7 +188,7 @@ class ProgressDao extends DatabaseAccessor<AppDatabase>
     double accuracy,
     int completedAtMs,
   ) {
-    return into(blockProgress).insertOnConflictUpdate(
+    return upsertBlock(
       BlockProgressCompanion.insert(
         userId: Value(userId),
         topicId: topicId,
