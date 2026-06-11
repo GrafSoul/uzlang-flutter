@@ -84,13 +84,11 @@ void _openSheet({
   required String subtitle,
   required List<_Option> Function() options,
 }) {
+  // Фон рисуем ВНУТРИ виджета: параметры роута не ребилдятся при смене
+  // темы, и шит оставался бы в цветах старой палитры.
   Get.bottomSheet<void>(
     _ChoiceSheet(title: title, subtitle: subtitle, optionsBuilder: options),
-    backgroundColor: AppColors.surface,
-    shape: const RoundedRectangleBorder(
-      borderRadius:
-          BorderRadius.vertical(top: Radius.circular(AppDimens.radiusXl)),
-    ),
+    backgroundColor: Colors.transparent,
   );
 }
 
@@ -121,49 +119,60 @@ class _ChoiceSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      child: Padding(
-        padding: const EdgeInsets.all(AppDimens.spaceLg),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: AppDimens.spaceLg),
-              decoration: BoxDecoration(
-                color: AppColors.line,
-                borderRadius: BorderRadius.circular(2),
+    return Container(
+      decoration: BoxDecoration(
+        color: AppColors.surface,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppDimens.radiusXl),
+        ),
+      ),
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.all(AppDimens.spaceLg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: AppDimens.spaceLg),
+                decoration: BoxDecoration(
+                  color: AppColors.line,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
-            Row(
-              children: [
-                Expanded(child: Text(title, style: AppTextStyles.title)),
-                _CircleBtn(icon: AppIcons.close, onTap: Get.back),
-              ],
-            ),
-            const SizedBox(height: AppDimens.spaceXs),
-            Align(
-              alignment: Alignment.centerLeft,
-              child: Text(subtitle,
-                  style: AppTextStyles.bodyRegular
-                      .copyWith(color: AppColors.textSecondary)),
-            ),
-            const SizedBox(height: AppDimens.spaceLg),
-            Obx(
-              () => Column(
+              Row(
                 children: [
-                  for (final o in optionsBuilder()) ...[
-                    _OptionTile(option: o),
-                    const SizedBox(height: AppDimens.spaceMd),
-                  ],
+                  Expanded(child: Text(title, style: AppTextStyles.title)),
+                  _CircleBtn(icon: AppIcons.close, onTap: Get.back),
                 ],
               ),
-            ),
-            const SizedBox(height: AppDimens.spaceSm),
-            PrimaryButton(label: 'Готово', onPressed: Get.back),
-          ],
+              const SizedBox(height: AppDimens.spaceXs),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  subtitle,
+                  style: AppTextStyles.bodyRegular.copyWith(
+                    color: AppColors.textSecondary,
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppDimens.spaceLg),
+              Obx(
+                () => Column(
+                  children: [
+                    for (final o in optionsBuilder()) ...[
+                      _OptionTile(option: o),
+                      const SizedBox(height: AppDimens.spaceMd),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: AppDimens.spaceSm),
+              PrimaryButton(label: 'Готово', onPressed: Get.back),
+            ],
+          ),
         ),
       ),
     );
@@ -188,9 +197,12 @@ class _OptionTile extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(option.title,
-                    style: AppTextStyles.label.copyWith(
-                        color: sel ? AppColors.accent : AppColors.textPrimary)),
+                Text(
+                  option.title,
+                  style: AppTextStyles.label.copyWith(
+                    color: sel ? AppColors.accent : AppColors.textPrimary,
+                  ),
+                ),
                 const SizedBox(height: 2),
                 Text(option.subtitle, style: AppTextStyles.caption),
               ],
@@ -201,10 +213,15 @@ class _OptionTile extends StatelessWidget {
               width: 26,
               height: 26,
               decoration: BoxDecoration(
-                  color: AppColors.accent, shape: BoxShape.circle),
+                color: AppColors.accent,
+                shape: BoxShape.circle,
+              ),
               child: Center(
-                child:
-                    AppIcon(AppIcons.check, color: AppColors.onAccent, size: 16),
+                child: AppIcon(
+                  AppIcons.check,
+                  color: AppColors.onAccent,
+                  size: 16,
+                ),
               ),
             )
           else
